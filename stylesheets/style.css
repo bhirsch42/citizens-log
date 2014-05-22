@@ -1,0 +1,285 @@
+@font-face {
+    font-family: 'droid_sansregular';
+    src: url('DroidSans-webfont.eot');
+    src: url('DroidSans-webfont.eot?#iefix') format('embedded-opentype'),
+         url('DroidSans-webfont.woff') format('woff'),
+         url('DroidSans-webfont.ttf') format('truetype'),
+         url('DroidSans-webfont.svg#droid_sansregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+	/*display: table;*/
+	/*margin: auto;*/
+}
+
+body {
+	/*-webkit-transform: rotate(-1deg);*/
+	/*-webkit-filter: blur(10px);*/
+	font-family: 'droid_sansregular';
+	/*background: url("../res/img-noise-361x370.png");*/
+	background: black;
+	color: #00e7ff;
+	/*width: 80%;*/
+	/*display: table-cell;*/
+	/*vertical-align: middle;*/
+	overflow: hidden;
+}
+
+span.bg {
+	/*background: url("../res/star_bg.png");*/
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	background-position: center;
+	background-repeat: no-repeat;
+	/*-webkit-filter: blur(5px);*/
+}
+
+div.screen {
+	position: absolute;
+	top: 121px;
+	bottom: 22px;
+	right: 22px;
+	left: 150px;
+	/*overflow: hidden;*/
+	/*outline: solid 1px #00e7ff;*/
+}
+
+div.screen-glow {
+	position: absolute;
+	pointer-events: none;
+	top: 120px;
+	bottom: 20px;
+	right: 20px;
+	left: 20px;
+	/*outline: solid 1px #00e7ff;*/
+	box-shadow: inset 0 0 50px #00e7ff;
+	z-index: 9997;
+}
+
+div.screen-background {
+	position: absolute;
+	pointer-events: none;
+	top: 120px;
+	bottom: 20px;
+	right: 20px;
+	left: 20px;
+	/*outline: solid 1px #00e7ff;*/
+	background: url("../res/holo.png");
+	z-index: 0;
+}
+
+div.entry-wrapper {
+	position: absolute;
+	border: solid 1px #00e7ff;
+	opacity: 10%;
+	width: 129px;
+	height: 20px;
+	left: -130px;
+	right: 90px;
+	overflow: hidden;
+	background-color: rgba(0, 231, 255, .2);
+	border-radius: 5px;
+}
+
+div.entry-title {
+	display: block;
+	/*background-color: #1e2f41;*/
+	background-color: rgba(0, 231, 255, .2);
+	color: white;
+	position: relative;
+	text-align: center;
+	height: 20px;
+	/*border-top-right-radius: 5px;*/
+	/*border-top-left-radius: 5px;*/
+}
+
+div.entry-content {
+	position: absolute;
+	height: 0;
+	left: 5px;
+	right: 0;
+	overflow: auto;
+}
+
+div.myscroll {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 100000;
+}
+
+/*Border divs*/
+
+div.bottom-left-corner {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+    width: 0;
+    height: 0;
+    border-bottom: solid black 10px;
+    border-top: solid transparent 10px;
+    border-left: solid black 10px;
+    border-right: solid transparent 10px;
+    z-index: 9999;
+}
+
+div.bottom-right-corner {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: solid black 10px;
+    border-top: solid transparent 10px;
+    border-left: solid transparent 10px;
+    border-right: solid black 10px;
+    z-index: 9999;
+}
+
+div.top-left-corner {
+	position: absolute;
+	top: 100px;
+	left: 0;
+    width: 0;
+    height: 0;
+    border-bottom: solid transparent 10px;
+    border-top: solid black 10px;
+    border-left: solid black 10px;
+    border-right: solid transparent 10px;
+    z-index: 9999;
+}
+
+div.left-side {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	left: 0;
+	top: 100px;
+    width: 0;
+    height: 100%;
+    border-left: solid transparent 20px;
+    z-index: 9998;
+}
+div.right-side {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	right: 0;
+    width: 0;
+    height: 100%;
+    border-right: solid transparent 20px;
+    z-index: 9998;
+}
+
+div.bottom {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	bottom: 0;
+	right: 0;
+    width: 100%;
+    height: 0;
+    border-bottom: solid transparent 20px;
+    z-index: 9998;
+}
+
+div.top-left-bar {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	top: 100px;
+	left: 20px;
+    width: 129px;
+    height: 0;
+    border-top: solid transparent 20px;
+    z-index: 9998;
+}
+
+div.top-left-inner-corner {
+	position: absolute;
+	top: 100px;
+	left: 150px;
+    width: 0;
+    height: 0;
+    border-bottom: solid black 10px;
+    border-top: solid transparent 10px;
+    border-left: solid transparent 10px;
+    border-right: solid black 10px;
+    z-index: 9999;	
+}
+
+div.top-diagonal-bar {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	top: 50px;
+	left: 121px;
+    width: 150px;
+    height: 0;
+    border-top: solid transparent 20px;
+    -webkit-transform: rotate(-45deg);
+    z-index: 9998;
+}
+
+div.top-bar {
+	background: url("../res/aluminum.jpg");
+	position: absolute;
+	top: 0;
+	left: 242px;
+    width: 100%;
+    height: 0;
+    border-top: solid transparent 20px;
+    z-index: 9999;	
+}
+
+div.top-right-corner {
+	position: absolute;
+	top: 0;
+	right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: solid transparent 10px;
+    border-top: solid black 10px;
+    border-left: solid transparent 10px;
+    border-right: solid black 10px;
+    z-index: 9999;	
+}
+
+div.top-left-block {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 50px;
+	height: 0;
+	border-top: solid black 100px;
+	border-left: solid black 100px;
+	/*border-bottom: solid transparent 100px;*/
+	border-right: solid transparent 100px;
+	z-index: 9997;
+}
+
+div.top-fill-block{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 120px;
+	z-index: 5000;
+	background: url("../res/metalholes.jpg")
+}
+
+/*slider*/
+
+div.myslider {
+	z-index: 10000;
+	position: absolute;
+	top: 140px;
+	bottom: 30px;
+	height: auto !important;
+	left: 8px;
+	width: 4px;
+}
+
+a.myslider {
+	width: 12px !important;
+	/*height: 3px !important;*/
+}

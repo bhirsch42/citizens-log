@@ -1,0 +1,66 @@
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="../stylesheets/style.css">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="../scripts/scripts.js"></script>
+</head>
+
+
+<body>
+	<span class="bg"></span>
+
+
+<div class="border-decoration">
+	<div class="bottom-left-corner"></div>
+	<div class="bottom-right-corner"></div>
+	<div class="left-side"></div>
+	<div class="right-side"></div>
+	<div class="bottom"></div>
+	<div class="top-left-corner"></div>
+	<div class="top-left-bar"></div>
+	<!-- <div class="top-left-inner-corner"></div> -->
+	<div class="top-diagonal-bar"></div>
+	<div class="top-bar"></div>
+	<div class="top-right-corner"></div>
+	<div class="cover"></div>
+	<div class="top-left-block"></div>
+	<div class="top-left-wedge"></div>
+	<div class="top-fill-block"></div>
+</div>
+
+
+<!-- slider -->
+<div id="slider-vertical" style="height:200px;" class="myslider ui-slider ui-slider-vertical ui-widget ui-widget-content ui-corner-all" aria-disabled="false">
+	<div class="ui-slider-range ui-widget-header ui-corner-all ui-slider-range-min" style="height: 50%;"></div>
+	<a class="myslider ui-slider-handle ui-state-default ui-corner-all" href="#" style="bottom: 50%;"></a>
+</div>
+<!-- end slider -->
+
+<div class="screen-glow"></div>
+<div class="screen-background"></div>
+<div class="screen">
+
+	{% for i in range(100) %}
+	<div class="entry entry-wrapper" id="entry-{{i}}" style="top: {{i*22}}">
+		<div class="entry entry-title" id="entry-{{i}}">
+			Title {{i}}
+		</div>
+		<div class="entry entry-content" id="entry-{{i}}">
+			Content, content, content.
+		</div>
+	</div>
+	{% endfor %}
+
+</div>
+
+
+
+</body>
+
+
+
+
+</html>
