@@ -99,9 +99,11 @@ div.entry-title {
 
 div.entry-content {
 	position: absolute;
-	height: 0;
+	/*height: auto;*/
+	width: auto;
 	left: 5px;
-	right: 0;
+	right: 0px;
+	padding-right: 12px;
 	overflow: auto;
 }
 

@@ -29,10 +29,9 @@ $(function() {
 	});
 });
 
-
 var entryMenuDist = 15
 var entryAnimationDuration = 300
-
+var entriesLength = parseInt($("#entries-length").attr("value"))
 
 function openEntry(id) {
 	selectEntry(id) 
@@ -61,7 +60,7 @@ function expandEntryWrapper(id) {
 		// "top": "50px",
 		// "left": "200px",
 		// "width": "500px",
-		// "bottom":"0",
+		// "bottom":"0"
 		"height": "100%"
 	}, entryAnimationDuration);
 }
@@ -169,6 +168,7 @@ $( ".entry" ).click(function(event) {
 			return
 		}
 		openEntry(event.target.id)
+		window.history.pushState("This", "That", "/" + event.target.id)
 	});
 });
 
@@ -198,7 +198,7 @@ function(event) {
 
 function getSliderOffset(ui) {
 	var divHeight = $(".screen").height()
-	var neededHeight = 100 * 22 // NEED VARIABLES
+	var neededHeight = entriesLength * 22 // NEED VARIABLES
 	var diff = neededHeight - divHeight
 	if (diff < 0) {
 		diff = 0
@@ -233,5 +233,15 @@ $(function() {
 		slide: scrollEntries
 	});
 });
+
+// go to the entry specified in the url, when page loads
+$(function() {
+	var id = location.pathname.split("entry-")[1]
+	if (!id) {
+		openEntry("entry-0")
+	}
+	openEntry("entry-" + id)
+});
+
 
 }

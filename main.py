@@ -19,10 +19,11 @@ from Handler import *
 import Database
 import urlparse
 import mimetypes
+import re
 
 class MainHandler(Handler):
 	def get(self):
-		self.render('home.html', user=self.get_user())
+		self.render('home.html', user=self.get_user(), entries_length=50)
 
 class LoginHandler(Handler):
 	def get(self):
@@ -162,6 +163,7 @@ class BioHandler(Handler):
 
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
+	(r'/entry-[0-9]+', MainHandler),
 	('/login', LoginHandler),
 	('/login/createaccount', CreateAccountHandler),
 	('/logout', LogoutHandler),
