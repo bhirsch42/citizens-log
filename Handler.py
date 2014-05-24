@@ -3,12 +3,13 @@ import jinja2
 import os
 import logging
 import time
-from google.appengine.api import users
 import Database
+import hmac
+
 
 class Handler(webapp2.RequestHandler):
 
- 	def initialize(self, *a, **kw):
+	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		# Initialize jinja2 environment
 		self.template_dir = os.path.join(os.path.dirname(__file__), 'html')
@@ -24,21 +25,50 @@ class Handler(webapp2.RequestHandler):
 	def render(self, template, **kw):
 		self.write(self.render_str(template, **kw))
 
-	def get_google_user(self):
-		return users.get_current_user()
+	def render_home(self, passwords_dont_match=False, username_is_taken=False, username_is_invalid=False, entries_length=1, log_user=None):
+		user = self.get_user()
+		self.render('home.html', passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid, entries_length=entries_length, user=user)
+
+	def get_user(self, username):
+		return Database.get_user(username)
+
+	def set_secure_cookie(self, name, val):
+		cookie_val = make_secure_val(val)
+		self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/' % (name, cookie_val))
+
+	def read_secure_cookie(self, name):
+		cookie_val = self.request.cookies.get(name)
+		return cookie_val and check_secure_val(cookie_val)
+
+	def login(self, user):
+		self.set_secure_cookie('user_id', str(user.username))
+
+	def logout(self):
+		self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
+
 
 	def get_user(self):
-		return Database.get_user_from_google_user(self.get_google_user())
+		username = self.read_secure_cookie('user_id')
+		if not username:
+			return None
+		return Database.get_user(username)
 
-	# def setSecureCookie(self, name, val, days = None):
-	# 	cookie_val = makeSecureVal(str(val))
-	# 	if days == None:
-	# 		self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/' % (name, cookie_val))
-	# 	else:
-	# 		expiration = datetime.datetime.now() + datetime.timedelta(days = days)
-	# 		self.response.headers.add_header('Set-Cookie', '%s=%s; expires=%s; Path=/;' % (name, cookie_val, expiration.strftime("%a, %d-%b-%Y %H:%M:%S GMT")))
+secret = "temporary secret never gonna give you up"
 
-	# def readSecureCookie(self, name):
-	# 	cookie_val = self.request.cookies.get(name)
-	# 	if cookie_val and checkSecureVal(cookie_val):
-	# 		return cookie_val.split('|')[0]
+def make_secure_val(val):
+	return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
+
+def check_secure_val(secure_val):
+	val = secure_val.split('|')[0]
+	if secure_val == make_secure_val(val):
+		return val
+
+
+
+
+
+
+
+
+
+

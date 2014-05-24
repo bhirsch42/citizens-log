@@ -1,19 +1,5 @@
 window.onload = function() {
-
- (function($){
-    $(window).load(function(){
-      $(".entry-content").mCustomScrollbar({
-        horizontalScroll:true,
-        autoDraggerLength:false
-      });
-      $(".entry-content").mCustomScrollbar({
-        mouseWheel:false,
-        scrollButtons:{
-          enable:true
-        }
-      });
-    });
-  })(jQuery);
+var entriesLength = parseInt($("#entries-length").attr("value"))
 
 // save initial css of all entries
 $(function() {
@@ -29,9 +15,26 @@ $(function() {
 	});
 });
 
+// $.getScript("scripts/markdown.min.js", function() {
+// 	$(function() {
+// 		$(".entry-content").each(function() {
+// 			var markup = $(this).text()
+// 			var converted = markdown.toHTML(markup)
+// 			$(this).html(converted)
+// 		})
+// 	})
+
+// });
+
+$("#markdown").on('input propertychange paste', function(event) {
+	var markup = $(this).val()
+	var converted = markdown.toHTML(markup)
+	// console.log(converted)
+	$("#markdown-converted").html(converted)
+})
+
 var entryMenuDist = 15
 var entryAnimationDuration = 300
-var entriesLength = parseInt($("#entries-length").attr("value"))
 
 function openEntry(id) {
 	selectEntry(id) 
@@ -155,22 +158,12 @@ function deselectEntry() {
 }
 
 // entry is clicked
-$( ".entry" ).click(function(event) {
-	// filter out the selected entry
-	if ($(this).is($(".selected"))) {
-		return
-	}
-	var id = $(".entry-wrapper.selected").attr("id")
-	deselectEntry(id)
-	closeEntry(id)
-	$( ".entry" ).promise().done(function() {
-		if ($(".selected").length > 0) {
-			return
-		}
-		openEntry(event.target.id)
-		window.history.pushState("This", "That", "/" + event.target.id)
-	});
-});
+// $( ".entry" ).click(function(event) {
+// 	// filter out the selected entry
+// 	if ($(this).is($(".selected") || $(this).is($(".input")))) {
+// 		return
+// 	}
+// });
 
 hoverAnimationDuration = 100
 
@@ -191,6 +184,34 @@ function(event) {
 		'background-color': 'rgba(0, 231, 255, 0.2)'
 	}, hoverAnimationDuration)
 
+});
+
+// toolbar options are hovered
+$(".topbar-option").hover(function(event) {
+	$(this).animate({
+		"background-color": "rgba(255, 255, 255, .2)",
+		"box-shadow": "0px 0px 1px black",
+		"color": "rgba(0, 231, 255, .5)",
+		"font-size":"17px"
+	}, hoverAnimationDuration)},
+function(event) {
+	$(this).animate({
+		"background-color":" rgba(255, 255, 255, .2)",
+		"box-shadow": "0px 0px 5px black",
+		"color": "rgba(0, 0, 0, .5)",
+		"font-size":"18px"
+	}, hoverAnimationDuration)
+});
+
+// links are hovered
+$("a").hover(function(event) {
+	$(this).animate({
+		"color": "white",
+	}, hoverAnimationDuration)},
+function(event) {
+	$(this).animate({
+		"color": "#00e7ff",
+	}, hoverAnimationDuration)
 });
 
 
@@ -234,13 +255,101 @@ $(function() {
 	});
 });
 
-// go to the entry specified in the url, when page loads
-$(function() {
-	var id = location.pathname.split("entry-")[1]
-	if (!id) {
-		openEntry("entry-0")
+// check registration form
+$("input#reg-username").keyup(function(event) {
+	console.log("WHAT")
+	if (!/^[-_0-9a-zA-Z]{3,20}$/.test($(this).val())) {
+		$(".username-error").html("Username may only contain numbers, letters, hyphens, and underscores, and must be 3 to 20 characters.")
+	} else {
+		$(".username-error").html("")
 	}
-	openEntry("entry-" + id)
+})
+
+
+function closeSelectedEntry() {
+	if ($(".entry-wrapper.selected").length == 0) {
+		return
+	}
+	var id = $(".entry-wrapper.selected").attr("id")
+	deselectEntry(id)
+	closeEntry(id)
+}
+
+function setHash(newhash) {
+	newhash = "!" + newhash
+	if ("#" + newhash == window.location.hash) {
+		return
+	}
+	window.location.hash = newhash
+	hashChanged()
+}
+
+
+// Map urls to screen states with regex
+
+$("a").click(function(event) {
+	console.log("Link cliked.")
+	event.preventDefault();
+	setHash($(this).attr("href").split("#")[1]);
+});
+
+$("a").click(function(event) {
+	console.log("Link cliked.")
+	event.preventDefault();
+	setHash($(this).attr("href").split("#")[1]);
+});
+
+function hashChanged() {
+	hash = window.location.hash
+	hash = hash.split("!")[1]
+	hashlist = hash.split('/')
+	if (/^login$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		openEntry('login')
+		return
+	}
+	if (/^register$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		openEntry('register')
+		return
+	}
+	if (/^mylog$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		if (hashlist[1] == "create-entry") {
+			closeSelectedEntry()
+			openEntry('create-entry')
+		}
+		// console.log($.getJSON('/control/getuser'))
+		// setHash('user/'+ $.getJSON('/control/getuser').username)
+		return
+	}
+	if (/^user$/.test(hashlist[0])) {
+		var username = hashlist[1]
+		$.ajax({
+			url: '/control/getuser?username=' + username,
+			type: 'GET',
+		    success: function(data) {console.log(JSON.parse(data).entries)}
+		})
+		return
+	}
+
+	// if (hashlist[0].equals('entry')) {
+	// 	var new_id = parseInt(hashlist[1])
+	// 	var id = $(".entry-wrapper.selected").attr("id")
+	// 	deselectEntry(id)
+	// 	closeEntry(id)
+	// 	$( ".entry" ).promise().done(function() {
+	// 		if ($(".selected").length > 0) {
+	// 			return
+	// 		}
+	// 		openEntry(new_id)
+	// 	});
+	// }
+}
+
+// On load, go to specified URL
+$(function() {
+	hashChanged()
 });
 
 
