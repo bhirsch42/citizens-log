@@ -27,12 +27,18 @@ var entryMenuDist = 15
 var entryAnimationDuration = 300
 
 function openEntry(id) {
+	var title = $(".page-title")
+	if (title.css("opacity") > 0) {
+		// $( ".screen" ).promise().done(function() {
+			title.animate({opacity: ".1"})
+		// })
+	}
 	selectEntry(id) 
 	openMoveEntryWrapper(id)
 	$( ":selected" ).promise().done(function() {
 		expandEntryWrapper(id)
 		expandEntryTitle(id)
-		expandEntryContent(id)
+		// expandEntryContent(id)
 	});
 }
 
@@ -41,7 +47,9 @@ function openMoveEntryWrapper(id) {
 		"top": "0px",
 		"left": "0px",
 		"width": "100%",
-	}, entryAnimationDuration);
+	}, entryAnimationDuration, function() {
+		$(this).css({overflow: "scroll"})
+	});
 
 	$("#" + id + ".entry-title").animate({
 		'background-color': 'rgba(0, 231, 255, 0.6)'
@@ -65,14 +73,16 @@ function expandEntryTitle(id) {
 	});
 }
 
-function expandEntryContent(id) {
+// function expandEntryContent(id) {
 	// Entry content
-	$("#" + id + ".entry-content").animate({
-		height: "100%",
-	}, function() {
-		$(this).css({"overflow":"scroll"})
-	}).addClass("selected");
-}
+	// $("#" + id + ".entry-content").animate({
+	// 	height: "100%",
+	// })
+	// console.log(id)
+	// , function() { console.log("Hi. " + id);
+	// 	$(this).css({"overflow":"scroll"})
+	// }).addClass("selected");
+// }
 
 function selectEntry(id) {
 	$("#" + id + ".entry-content").addClass("selected")
@@ -94,8 +104,11 @@ function closeMoveEntryWrapper(id) {
 			"top": parseInt(orig.top.split("px")[0])+lastTrans,
 			"left": orig.left,
 			"width": orig.width,
+			scrollTop: 0
 			// "height": orig.height,
-		}, entryAnimationDuration)
+		}, entryAnimationDuration, function() {
+			$(this).css({"overflow": "Hidden"})
+		})
 	});
 	$("#" + id + ".entry-title").each(function() {
 		var orig = $.data(this, 'css')	
@@ -158,16 +171,19 @@ $( document.body ).on("click", ".entry-title", function(event) {
 
 // My Log button is clicked
 $("#mylog").click(function(event) {
-	setHash('user/' + getUsernameFromCookie())
+	var username = getUsernameFromCookie()
+	if (!username) {
+		setHash("login")
+		return
+	}
+	setHash('user/' + username)
 })
-
-// Create Entry is clicked
-// $("#create-entry").click(function(event) {
-
-// })
 
 function getUsernameFromCookie() {
 	var cookieValue = $.cookie("user_id");
+	if (!cookieValue) {
+		return null
+	}
 	var username = cookieValue.split("|")[0]
 	return username
 }
@@ -203,7 +219,7 @@ function(event) {
 });
 
 // check registration form
-$("input#reg-username").keyup(function(event) {
+$("input.register[name=username]").on("click keyup", function(event) {
 	if (!/^[-_0-9a-zA-Z]{3,20}$/.test($(this).val())) {
 		$(".username-error").html("Username may only contain numbers, letters, hyphens, and underscores, and must be 3 to 20 characters.")
 	} else {
@@ -227,7 +243,7 @@ function setHash(newhash) {
 		return
 	}
 	window.location.hash = newhash
-	hashChanged()
+	// hashChanged()
 }
 
 function appendUserLogs(username, hashlist) {
@@ -246,16 +262,16 @@ function appendUserLogs(username, hashlist) {
 		// $(".log-entries").html(s)
 		// add entries
 		for (i = 0; i < user.entries.length; i++) {
-			// var $a = $("<a>", {href: "#entry-" + i})
+			var e = user.entries.length - i - 1
 			var $div = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
-			var $title = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-title", text: user.entries[i].title})
-			var $content = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-content"}).html(markdown.toHTML(user.entries[i].content))
+			var $title = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-title", text: user.entries[e].title})
+			var $content = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-content"}).html(markdown.toHTML(user.entries[e].content))
 			$div.append($title)
 			$div.append($content)
 			// $a.append($div)
 			$(".log-entries").append($div)
-			openEntry(hashlist[2])
 		}
+		// openEntry(hashlist[2])
 		// save their CSS for animations
 		saveCSS()
 		// bind animation methods
@@ -333,41 +349,60 @@ var lastUser = null
 function hashChanged() {
 	hash = window.location.hash
 	hash = hash.split("!")[1]
+	if (!hash) {
+		openEntry('browse-logs')
+		return
+	}
 	hashlist = hash.split('/')
 	if (/^login$/.test(hashlist[0])) {
 		closeSelectedEntry()
 		$( ".entry" ).promise().done(function() {		
 			openEntry('login')
 		})
-		return
 	}
+
 	if (/^register$/.test(hashlist[0])) {
 		closeSelectedEntry()
 		$( ".entry" ).promise().done(function() {		
 			openEntry('register')
 		})
-		return
 	}
+
 	if (/^user$/.test(hashlist[0])) {
 		if (hashlist.length > 1) {
 			var username = hashlist[1]
+			
+			// manage entries
 			closeSelectedEntry()
-				if ($(".selected").length > 0) {
-					return
-				}
+			if ($(".selected").length > 0) {
+				return
+			}
+			$(".page-title").animate({opacity: "1"})
+			$( ".entry" ).promise().done(function() {
+				// if the user in the hash has changed, reload the logs and modify the page title
 				if (username != lastUser) {
-					$(".screen-glow").animate({"background-color":"rgba(0,0,0,1)"}, function() {
+					$(".screen").animate({"left":"-50"}, function() {
 						appendUserLogs(username, hashlist)
 						lastUser = username
-						$(".screen-glow").animate({"background-color":"rgba(0,0,0,0)"})
+						$(".screen").animate({"left":"150"})
 					})
-				} else {
-					$( ".entry" ).promise().done(function() {
-						openEntry(hashlist[2])
-					});
+					// modify content of page title
+					$.get('/control/getuser?username='+username, function(data) {
+						user = JSON.parse(data)
+						$(".page-title").animate({opacity: "0"})
+						$(".page-title").promise().done(function() {
+							$(".page-title").html(user.pageName)
+							$(".page-title").animate({opacity: "1"})
+						})
+					})
 				}
+				if (hashlist.length > 2) {
+					$( ".screen" ).promise().done(function() {
+						openEntry(hashlist[2])
+					})
+				}
+			});
 		}
-		return
 	}
 
 	if (/^accountcreated$/.test(hashlist[0])) {
@@ -385,7 +420,37 @@ function hashChanged() {
 		})
 		return
 	}
+
+	if (/^createentry$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		$(".page-title").animate({opacity: "1"})
+		appendUserLogs(username, hashlist)
+		lastUser = username
+		return
+	}
+
+	if (/^browse\-logs$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		$(".page-title").animate({opacity: "1"})
+		$( ".entry" ).promise().done(function() {		
+			openEntry('browse-logs')
+		})
+		return
+	}
 }
+
+// Generate the "Browse Logs" entry
+$(function() {
+	$.get('/control/getallusers', function(data) {
+		users = JSON.parse(data)
+		for (i = 0; i < users.length; i++) {
+			username = users[i].username
+			pageName = users[i].pageName
+			var s = "<a href=\"#!user/" + username + "\"><div class=\"browse-logs-option\"><div class=\"browse-logs-option-pagename\">" + pageName + "</div><div class=\"browse-logs-option-username\">" + username + "</div></div></a>"
+			$(".browse-logs-container").append(s)
+		}
+	})
+})
 
 // On load, go to specified URL and save animation locations
 $(function() {
@@ -393,5 +458,8 @@ $(function() {
 	saveCSS()
 });
 
+$(window).on('hashchange',function(){ 
+    hashChanged()
+});
 
 }

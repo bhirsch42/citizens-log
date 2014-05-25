@@ -25,9 +25,9 @@ class Handler(webapp2.RequestHandler):
 	def render(self, template, **kw):
 		self.write(self.render_str(template, **kw))
 
-	def render_home(self, passwords_dont_match=False, username_is_taken=False, username_is_invalid=False, entries_length=1, log_user=None):
+	def render_home(self, passwords_dont_match=False, username_is_taken=False, username_is_invalid=False, entries_length=1, log_user=None, login_error=False):
 		user = self.get_user()
-		self.render('home.html', passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid, entries_length=entries_length, user=user)
+		self.render('home.html', passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid, entries_length=entries_length, user=user, login_error=login_error)
 
 	def get_user(self, username):
 		return Database.get_user(username)
@@ -53,7 +53,7 @@ class Handler(webapp2.RequestHandler):
 			return None
 		return Database.get_user(username)
 
-secret = "temporary secret never gonna give you up"
+secret = open('secret.txt').read()
 
 def make_secure_val(val):
 	return '%s|%s' % (val, hmac.new(secret, val).hexdigest())

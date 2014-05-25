@@ -43,11 +43,18 @@ class MainHandler(Handler):
 		password = self.request.get('password')
 		if (Database.valid_password(username, password)):
 			self.login(Database.get_user(username))
-		self.render_home()
+		else:
+			self.render_home(login_error=True)
+			return
+		s = str('#!user/' + username)
+		self.redirect(s)
 
 
 	def entry_post(self):
-		logging.info("Entry_post called")
+		if not self.read_secure_cookie('user_id'):
+			s = str('#!login')
+			self.redirect(s)
+			return
 		markdown = self.request.get('markdown')
 		Database.add_entry(self.get_user(), markdown)
 		s = str('#!user/' + self.get_user().username)
@@ -115,7 +122,18 @@ class GetUserHandler(Handler):
 		logging.info(str(obj))
 		self.response.write(str(obj))
 
+class GetAllUsersHandler(Handler):
+	def get(self):
+		users = []
+		for username in Database.get_all_users():
+			user = Database.get_user(username)
+			# logging.error(user.username)
+			users.append({"username": user.username, "pageName": user.page_name})
+		obj = json.dumps(users)
+		self.response.write(str(obj))
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/control/getuser', GetUserHandler),
+	('/control/getallusers', GetAllUsersHandler)
 ], debug=True)

@@ -87,6 +87,7 @@ div.entry-wrapper {
 	overflow: hidden;
 	background-color: rgba(0, 231, 255, .2);
 	border-radius: 5px;
+	overflow: hidden;
 }
 
 div.entry-title {
@@ -108,7 +109,6 @@ div.entry-content {
 	left: 5px;
 	right: 0px;
 	padding-right: 12px;
-	overflow: scroll;
 }
 
 div.myscroll {
@@ -214,18 +214,6 @@ div.top-left-inner-corner {
     z-index: 9999;	
 }
 
-/*div.top-diagonal-bar {
-	background: url("../res/aluminum.jpg");
-	position: absolute;
-	top: 50px;
-	left: 121px;
-    width: 150px;
-    height: 0;
-    border-top: solid transparent 20px;
-    -webkit-transform: rotate(-45deg);
-    z-index: 9998;
-}
-*/
 div.top-bar {
 	background: url("../res/aluminum.jpg");
 	position: absolute;
@@ -363,6 +351,53 @@ span.markdown {
 	width: 100%;
 }
 
-#create-entry {
+.entry-wrapper#create-entry {
 	top: 0px;
+	visibility: hidden;
+}
+
+div.page-title {
+	position: absolute;
+	text-align: center;
+	width: 100%;
+	line-height: 100%;
+	top: 40%;
+	font-size: 36px;
+	opacity: 0;
+}
+
+div.browse-logs-entry-wrapper {
+	position: absolute;
+	position: absolute;
+	top: -25px;
+	left: 200px;
+}
+
+div.browse-logs-option {
+	position: relative;
+	background: url("../res/logicon.png") no-repeat;
+	height: 200px;
+	width: 300px;
+	display: inline-block;
+	margin: 10px;
+	border-radius: 5px;
+}
+
+div.browse-logs-option-pagename {
+	position: absolute;
+	padding: 10px;
+	top: 25px;
+	text-align: center;
+	font-size: 20px;
+}
+
+div.browse-logs-option-username {
+	position: absolute;
+	bottom: 7px;
+	right: 10px;
+	font-size: 12px;
+}
+
+span.error {
+	color: red;
 }

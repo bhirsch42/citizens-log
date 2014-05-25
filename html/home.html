@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="../scripts/jquery.animate-shadow-min.js"></script>
 	<script type="text/javascript" src="../scripts/markdown.min.js"></script>
 	<script type="text/javascript" src="../scripts/jquery.cookie.js"></script>
+	<!--<script type="text/javascript" src="../scripts/jquery.mousewheel.min.js"></script>   -->
 </head>
 
 
@@ -54,11 +55,13 @@
 			My Log
 		</div>
 	</div>
-	<div class="topbar-option-wrapper" style="left: 395px;">
-		<div class="topbar-option" id="browse-logs">
-			Browse Logs
+	<a href="#browse-logs">
+		<div class="topbar-option-wrapper" style="left: 395px;">
+			<div class="topbar-option" id="browse-logs">
+				Browse Logs
+			</div>
 		</div>
-	</div>
+	</a>
 	<a href="#login">
 		<div class="topbar-option-wrapper" style="left: 625;">
 			<div class="topbar-option" id="login">
@@ -77,12 +80,12 @@
 			<form method="POST">
 				Username<br>
 				<input name="form-type" type="hidden" value="login">
-				<input class="input" type="text" name="username"><br>
+				<input class="input login" type="text" name="username" required="required"><br>
 				<br>
 				Password<br>
-				<input class="input" type="password" name="password"><br>
+				<input class="input login" type="password" name="password" required="required"><br>
 				<br>
-				<input type="submit"><br>
+				<input type="submit">{% if login_error %}<span class="error"> Username or password is invalid.</span>{% endif %}<br>
 				<br>
 				Don't have a log? <a href="#register">Make one</a>.
 			</form>
@@ -94,20 +97,20 @@
 			<form method="POST">
 				<input name="form-type" type="hidden"value="register">
 				Username*<br>
-				<input class="input" type="text" name="username" required="required">{% if username_is_invalid %} Username is invalid. {% endif %}{% if username_taken %} Username already taken. {% endif %}
+				<input class="input register" type="text" name="username" required="required"><span class="error">{% if username_is_invalid %} Username is invalid. {% endif %}{% if username_is_taken %} Username already taken. {% endif %}</span>
 				<div class="username-error"></div>
 				<br>
 				Password*<br>
-				<input class="input" type="password" name="password" required="required">{% if passwords_dont_match %} Passwords don't match. {% endif %}<br>
+				<input class="input register" type="password" name="password" required="required"><span class="error">{% if passwords_dont_match %} Passwords don't match. {% endif %}</span><br>
 				<br>
 				Repeat password*<br>
-				<input class="input" type="password" name="password-repeat" required="required"><br>
+				<input class="input register" type="password" name="password-repeat" required="required"><br>
 				<br>
 				Name of Log*<br>
-				<input class="input" type="text" name="page-name" required="required"><br>
+				<input class="input register" type="text" name="page-name" required="required"><br>
 				<br>
 				Email (For password recovery only)<br>
-				<input class="input" type="text" name="email"><br>
+				<input class="input register" type="text" name="email"><br>
 				<br>
 				<input type="submit"><br>
 			</form>
@@ -119,9 +122,20 @@
 			Account created successfully.
 		</div>
 	</div>
+	<!-- Browse Logs -->
+	<div class="entry entry-wrapper browse-logs-entry-wrapper" id="browse-logs">
+		<div class="browse-logs-container" id="browse-logs">
+
+		</div>
+	</div>
+
+	<!-- Page title -->
+	<div class="page-title"></div>
 
 	<!-- Create entry -->
 	<div class="sidebar">
+		<!-- scrollwheel capture element -->
+		<!-- <div class="scrollwheel"></div> -->
 		<div class="entry entry-wrapper" id="create-entry">
 			<div id="create-entry" name="createentry" class="entry entry-title">
 				Create Entry

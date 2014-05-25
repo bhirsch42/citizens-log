@@ -4,7 +4,7 @@ from google.appengine.api import memcache
 import hashlib
 import random
 from string import letters
-from datetime import datetime
+import time
 
 users_key = "users"
 
@@ -31,7 +31,10 @@ def make_password_hash(name, pw, salt = None):
 	return '%s,%s' % (salt, h)
 
 def valid_password(username, password):
-	h = get_user(username).password_hash
+	user = get_user(username)
+	if not user:
+		return False
+	h = user.password_hash
 	salt = h.split(',')[0]
 	return h == make_password_hash(username, password, salt)
 
@@ -54,8 +57,7 @@ def add_user(page_name, username, password, email):
 	return True
 
 def add_entry(user, content):
-	d = datetime.now()
-	title = "%s/%s/%s %s:%s" % (d.month, d.day, d.year % 1000, d.hour, d.minute)
+	title = time.strftime("%m/%d/%y %H:%M", time.localtime())
 	entry = Entry(title = title, content = content)
 	if not user.entries:
 		user.entries = [entry]
