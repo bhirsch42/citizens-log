@@ -2,7 +2,9 @@ window.onload = function() {
 var entriesLength = parseInt($("#entries-length").attr("value"))
 
 // save initial css of all entries
-$(function() {
+var lastTrans = 0
+
+function saveCSS() {
 	$(".entry").each(function() {
 		var $this = $(this);
 		$.data(this, 'css', {
@@ -13,23 +15,11 @@ $(function() {
 			overflow: $this.css('overflow')
 		});
 	});
-});
-
-// $.getScript("scripts/markdown.min.js", function() {
-// 	$(function() {
-// 		$(".entry-content").each(function() {
-// 			var markup = $(this).text()
-// 			var converted = markdown.toHTML(markup)
-// 			$(this).html(converted)
-// 		})
-// 	})
-
-// });
+};
 
 $("#markdown").on('input propertychange paste', function(event) {
 	var markup = $(this).val()
 	var converted = markdown.toHTML(markup)
-	// console.log(converted)
 	$("#markdown-converted").html(converted)
 })
 
@@ -158,33 +148,31 @@ function deselectEntry() {
 }
 
 // entry is clicked
-// $( ".entry" ).click(function(event) {
-// 	// filter out the selected entry
-// 	if ($(this).is($(".selected") || $(this).is($(".input")))) {
-// 		return
-// 	}
-// });
+$( document.body ).on("click", ".entry-title", function(event) {
+	// filter out the selected entry
+	if ($(this).is($(".selected") || $(this).is($(".input")))) {
+		return
+	}
+	setHash($(this).attr("name"))
+});
+
+// My Log button is clicked
+$("#mylog").click(function(event) {
+	setHash('user/' + getUsernameFromCookie())
+})
+
+// Create Entry is clicked
+// $("#create-entry").click(function(event) {
+
+// })
+
+function getUsernameFromCookie() {
+	var cookieValue = $.cookie("user_id");
+	var username = cookieValue.split("|")[0]
+	return username
+}
 
 hoverAnimationDuration = 100
-
-// entry is hovered
-$( ".entry-title" ).hover(function(event) {
-	// filter out the selected entry
-	if ($(this).is($(".selected"))) {
-		return
-	}
-	$(this).animate({
-		"background-color":"rgba(0, 231, 255, 0.6)"
-}, hoverAnimationDuration)},
-function(event) {
-	if ($(this).is($(".selected"))) {
-		return
-	}
-	$(this).animate({
-		'background-color': 'rgba(0, 231, 255, 0.2)'
-	}, hoverAnimationDuration)
-
-});
 
 // toolbar options are hovered
 $(".topbar-option").hover(function(event) {
@@ -214,50 +202,8 @@ function(event) {
 	}, hoverAnimationDuration)
 });
 
-
-// slider
-
-function getSliderOffset(ui) {
-	var divHeight = $(".screen").height()
-	var neededHeight = entriesLength * 22 // NEED VARIABLES
-	var diff = neededHeight - divHeight
-	if (diff < 0) {
-		diff = 0
-	}
-	var trans = ui.value * diff
-	return trans
-}
-
-var lastTrans = 0
-
-function scrollEntries(event, ui) {
-	var trans = getSliderOffset(ui)
-	lastTrans = trans
-	$( ".entry-wrapper" ).each(function(i, obj) {
-		if (!$(this).is($(".selected"))) {
-			var orig = $.data(obj, 'css');
-			$(this).css({
-				"top": parseInt(orig.top.split("px")[0])+trans
-			});
-		}
-	});
-}
-
-$(function() {
-	$( "#slider-vertical" ).slider({
-		orientation: "vertical",
-		step: 1.0/1000,
-		range: "min",
-		min: -1.0,
-		max: 0.0,
-		value: 0,
-		slide: scrollEntries
-	});
-});
-
 // check registration form
 $("input#reg-username").keyup(function(event) {
-	console.log("WHAT")
 	if (!/^[-_0-9a-zA-Z]{3,20}$/.test($(this).val())) {
 		$(".username-error").html("Username may only contain numbers, letters, hyphens, and underscores, and must be 3 to 20 characters.")
 	} else {
@@ -284,20 +230,105 @@ function setHash(newhash) {
 	hashChanged()
 }
 
+function appendUserLogs(username, hashlist) {
+	$.get('/control/getuser?username='+username, function(data) {
+		user = JSON.parse(data)
+		username = user.username
+		// clear the sidebar
+		$(".log-entries").html("")
+		// set visibility of "create entry" option
+		var createEntryVisible = getUsernameFromCookie() == username
+		if (createEntryVisible) {
+			$("#create-entry").css({visibility: "visible"})
+		} else {
+			$("#create-entry").css({visibility: "hidden"})
+		}
+		// $(".log-entries").html(s)
+		// add entries
+		for (i = 0; i < user.entries.length; i++) {
+			// var $a = $("<a>", {href: "#entry-" + i})
+			var $div = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
+			var $title = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-title", text: user.entries[i].title})
+			var $content = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-content"}).html(markdown.toHTML(user.entries[i].content))
+			$div.append($title)
+			$div.append($content)
+			// $a.append($div)
+			$(".log-entries").append($div)
+			openEntry(hashlist[2])
+		}
+		// save their CSS for animations
+		saveCSS()
+		// bind animation methods
+		$(".entry-title").hover(function(event) {
+			// filter out the selected entry
+			if ($(this).is($(".selected"))) {
+				return
+			}
+			$(this).animate({
+				"background-color":"rgba(0, 231, 255, 0.6)"
+		}, hoverAnimationDuration)},
+		function(event) {
+			if ($(this).is($(".selected"))) {
+				return
+			}
+			$(this).animate({
+				'background-color': 'rgba(0, 231, 255, 0.2)'
+			}, hoverAnimationDuration)
+		});
+
+		// bind scrolling behavior
+		function scrollEntries(event, ui) {
+			var trans = getSliderOffset(ui)
+			lastTrans = trans
+			$(".sidebar").find(".entry-wrapper").each(function(i, obj) {
+				if (!$(this).is($(".selected"))) {
+					var orig = $.data(obj, 'css');
+					$(this).css({
+						"top": parseInt(orig.top.split("px")[0])+trans
+					});
+				}
+			});
+		}
+
+		$(function() {
+			$( "#slider-vertical" ).slider({
+				orientation: "vertical",
+				step: 1.0/1000,
+				range: "min",
+				min: -1.0,
+				max: 0.0,
+				value: 0,
+				slide: scrollEntries
+			});
+		});
+
+		function getSliderOffset(ui) {
+			var divHeight = $(".screen").height()
+			var neededHeight = (user.entries.length + createEntryVisible) * 22 // NEED VARIABLES
+			var diff = neededHeight - divHeight
+			if (diff < 0) {
+				diff = 0
+			}
+			var trans = ui.value * diff
+			return trans
+		}
+
+	})
+}
 
 // Map urls to screen states with regex
 
 $("a").click(function(event) {
-	console.log("Link cliked.")
 	event.preventDefault();
 	setHash($(this).attr("href").split("#")[1]);
 });
 
 $("a").click(function(event) {
-	console.log("Link cliked.")
 	event.preventDefault();
 	setHash($(this).attr("href").split("#")[1]);
 });
+
+var lastUser = null
 
 function hashChanged() {
 	hash = window.location.hash
@@ -305,51 +336,61 @@ function hashChanged() {
 	hashlist = hash.split('/')
 	if (/^login$/.test(hashlist[0])) {
 		closeSelectedEntry()
-		openEntry('login')
+		$( ".entry" ).promise().done(function() {		
+			openEntry('login')
+		})
 		return
 	}
 	if (/^register$/.test(hashlist[0])) {
 		closeSelectedEntry()
-		openEntry('register')
-		return
-	}
-	if (/^mylog$/.test(hashlist[0])) {
-		closeSelectedEntry()
-		if (hashlist[1] == "create-entry") {
-			closeSelectedEntry()
-			openEntry('create-entry')
-		}
-		// console.log($.getJSON('/control/getuser'))
-		// setHash('user/'+ $.getJSON('/control/getuser').username)
+		$( ".entry" ).promise().done(function() {		
+			openEntry('register')
+		})
 		return
 	}
 	if (/^user$/.test(hashlist[0])) {
-		var username = hashlist[1]
-		$.ajax({
-			url: '/control/getuser?username=' + username,
-			type: 'GET',
-		    success: function(data) {console.log(JSON.parse(data).entries)}
+		if (hashlist.length > 1) {
+			var username = hashlist[1]
+			closeSelectedEntry()
+				if ($(".selected").length > 0) {
+					return
+				}
+				if (username != lastUser) {
+					$(".screen-glow").animate({"background-color":"rgba(0,0,0,1)"}, function() {
+						appendUserLogs(username, hashlist)
+						lastUser = username
+						$(".screen-glow").animate({"background-color":"rgba(0,0,0,0)"})
+					})
+				} else {
+					$( ".entry" ).promise().done(function() {
+						openEntry(hashlist[2])
+					});
+				}
+		}
+		return
+	}
+
+	if (/^accountcreated$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		$( ".entry" ).promise().done(function() {		
+			openEntry('accountcreated')
 		})
 		return
 	}
 
-	// if (hashlist[0].equals('entry')) {
-	// 	var new_id = parseInt(hashlist[1])
-	// 	var id = $(".entry-wrapper.selected").attr("id")
-	// 	deselectEntry(id)
-	// 	closeEntry(id)
-	// 	$( ".entry" ).promise().done(function() {
-	// 		if ($(".selected").length > 0) {
-	// 			return
-	// 		}
-	// 		openEntry(new_id)
-	// 	});
-	// }
+	if (/^createentry$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		$( ".entry" ).promise().done(function() {		
+			openEntry('create-entry')
+		})
+		return
+	}
 }
 
-// On load, go to specified URL
+// On load, go to specified URL and save animation locations
 $(function() {
 	hashChanged()
+	saveCSS()
 });
 
 

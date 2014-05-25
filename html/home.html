@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="../scripts/markdown.min.js"></script>
 	<script type="text/javascript" src="../scripts/jquery.animate-shadow-min.js"></script>
 	<script type="text/javascript" src="../scripts/markdown.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.cookie.js"></script>
 </head>
 
 
@@ -48,13 +49,11 @@
 
 <!-- topbar -->
 <div class="topbar-wrapper">
-	<a href="#mylog">
-		<div class="topbar-option-wrapper" style="left: 170px;">
-			<div class="topbar-option" id="my-log">
-				My Log
-			</div>
+	<div id="mylog" class="topbar-option-wrapper" style="left: 170px;">
+		<div class="topbar-option" id="my-log">
+			My Log
 		</div>
-	</a>
+	</div>
 	<div class="topbar-option-wrapper" style="left: 395px;">
 		<div class="topbar-option" id="browse-logs">
 			Browse Logs
@@ -73,11 +72,11 @@
 <!-- screen -->
 <div class="screen">
 <!-- login window (hidden by default) -->
-	<div class="entry entry-wrapper" id="login">
+	<div class="entry entry-wrapper account-entry-wrapper" id="login">
 		<div class="login-container" id="login">
 			<form method="POST">
 				Username<br>
-				<input name="form-type" type="hidden" value="login"></span>
+				<input name="form-type" type="hidden" value="login">
 				<input class="input" type="text" name="username"><br>
 				<br>
 				Password<br>
@@ -90,10 +89,10 @@
 		</div>
 	</div>
 	<!-- register entry -->
-	<div class="entry entry-wrapper" id="register">
+	<div class="entry entry-wrapper account-entry-wrapper" id="register">
 		<div class="login-container" id="register">
 			<form method="POST">
-				<span name="form-type" value="register" type="hidden"></span>
+				<input name="form-type" type="hidden"value="register">
 				Username*<br>
 				<input class="input" type="text" name="username" required="required">{% if username_is_invalid %} Username is invalid. {% endif %}{% if username_taken %} Username already taken. {% endif %}
 				<div class="username-error"></div>
@@ -105,7 +104,7 @@
 				<input class="input" type="password" name="password-repeat" required="required"><br>
 				<br>
 				Name of Log*<br>
-				<input class="input" type="text" name="log-name" required="required"><br>
+				<input class="input" type="text" name="page-name" required="required"><br>
 				<br>
 				Email (For password recovery only)<br>
 				<input class="input" type="text" name="email"><br>
@@ -115,34 +114,38 @@
 		</div>
 	</div>
 	<!-- account created successfully entry -->
-	<div class="entry entry-wrapper" id="entry-accountcreated">
-		<div class="login-container" id="entry-accountcreated">
+	<div class="entry entry-wrapper account-entry-wrapper" id="accountcreated">
+		<div class="login-container" id="accountcreated">
 			Account created successfully.
 		</div>
 	</div>
 
 	<!-- Create entry -->
-	<div class="entry entry-wrapper" id="create-entry">
-		<a href="#mylog/create-entry">
-			<div class="entry entry-title">
+	<div class="sidebar">
+		<div class="entry entry-wrapper" id="create-entry">
+			<div id="create-entry" name="createentry" class="entry entry-title">
 				Create Entry
 			</div>
-		</a>
-		<div class="entry entry-content">
-			<table class="markdown">
-				<tr>
-					<td class="markdown">
-						<form method="POST">
-							<input name="form-type" type="hidden" value="entry"></span>
-							<textarea class="markdown" id="markdown" name="markdown" rows="10"></textarea>
-							<input type="submit"/>
-						</form>
-					</td>
-					<td class="markdown">
-						<span class="markdown" id="markdown-converted"></span>
-					</td>
-				</tr>
-			</table>
+			<div class="entry entry-content">
+				<table class="markdown">
+					<tr>
+						<td class="markdown">
+							<form method="POST">
+								<input name="form-type" type="hidden" value="entry">
+								<textarea class="markdown" id="markdown" name="markdown" rows="10" required="required"></textarea>
+								<input type="submit"/>
+							</form>
+						</td>
+						<td class="markdown">
+							<span class="markdown" id="markdown-converted"></span>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<!-- Log entries -->
+		<div class="log-entries">
 		</div>
 	</div>
 </div>

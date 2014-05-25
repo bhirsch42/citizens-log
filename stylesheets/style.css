@@ -270,7 +270,7 @@ div.top-fill-block{
 	left: 0;
 	width: 100%;
 	height: 100px;
-	/*z-index: 50000;*/
+	z-index: 5000;
 	background: url("../res/aluminum.jpg");
 }
 
@@ -329,7 +329,7 @@ div.topbar-option {
 	font-size: 18px;
 }
 
-div.entry-wrapper#login {
+div.account-entry-wrapper {
 	position: absolute;
 	top: -25px;
 	left: 500px;
@@ -339,18 +339,6 @@ div.login-container {
 	position: absolute;
 	top: 10px;
 	left: 10px;
-}
-
-div.entry-wrapper#register {
-	position: absolute;
-	top: -25px;
-	left: 500px;
-}
-
-div.entry-wrapper#entry-accountcreated {
-	position: absolute;
-	top: -25px;
-	left: 500px;
 }
 
 table.markdown {
@@ -373,4 +361,8 @@ span.markdown {
 	/*top: 0;*/
 	/*left: 50%;*/
 	width: 100%;
+}
+
+#create-entry {
+	top: 0px;
 }

@@ -35,18 +35,49 @@ class MainHandler(Handler):
 			self.login_post()
 		elif (form_type == 'entry'):
 			self.entry_post()
-		self.render_home()
+		elif (form_type == 'register'):
+			self.register_post()
 
 	def login_post(self):
 		username = self.request.get('username')
 		password = self.request.get('password')
 		if (Database.valid_password(username, password)):
 			self.login(Database.get_user(username))
+		self.render_home()
+
 
 	def entry_post(self):
 		logging.info("Entry_post called")
 		markdown = self.request.get('markdown')
 		Database.add_entry(self.get_user(), markdown)
+		s = str('#!user/' + self.get_user().username)
+		self.redirect(s)
+
+	def register_post(self):
+		username_is_taken = False
+		passwords_dont_match = False
+		username_is_invalid = False
+
+		username = self.request.get('username')
+		logging.info("Username: " + username)
+		password = self.request.get('password')
+		password_repeat = self.request.get('password-repeat')
+		email = self.request.get('email')
+		page_name = self.request.get('page-name')
+
+		if username in Database.get_all_users():
+			username_is_taken = True
+		if password != password_repeat:
+			passwords_dont_match = True
+		if re.match("^[a-zA-Z0-9_-]{3,20}$", username) is None:
+			username_is_invalid = True
+			logging.info("Invalid username: " + username)
+		if username_is_taken or passwords_dont_match or username_is_invalid:
+			logging.info("Invalid registration attempted.")
+			self.render_home(passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid)
+			return
+		Database.add_user(page_name, username, password, email)
+		self.redirect('#!accountcreated')
 
 # class LoginHandler(Handler):
 # 	def get(self):
@@ -59,31 +90,6 @@ class MainHandler(Handler):
 # 	def get(self):
 # 		self.render_home()
 # 	def post(self):
-# 		username_is_taken = False
-# 		passwords_dont_match = False
-# 		username_is_invalid = False
-
-# 		username = self.request.get('reg-username')
-# 		logging.info("Username: " + username)
-# 		password = self.request.get('reg-password')
-# 		password_repeat = self.request.get('password-repeat')
-# 		email = self.request.get('email')
-# 		page_name = self.request.get('page-name')
-
-# 		if username in Database.get_all_users():
-# 			username_is_taken = True
-# 		if password != password_repeat:
-# 			passwords_dont_match = True
-# 		if re.match("^[a-zA-Z0-9_-]{3,20}$", username) is None:
-# 			username_is_invalid = True
-# 			logging.info("Invalid username: " + username)
-# 		if username_is_taken or passwords_dont_match or username_is_invalid:
-# 			logging.info("Invalid registration attempted.")
-# 			self.render_home(passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid)
-# 			return
-
-# 		Database.add_user(page_name, username, password, email)
-# 		self.redirect('/entry-accountcreated')
 
 
 class GetUserHandler(Handler):
@@ -93,12 +99,21 @@ class GetUserHandler(Handler):
 		user = None
 		if len(query_list) < 2:
 			user = self.get_user()
+			logging.info("Ajax got logged-in user")
 		else:
 			username = query_list[1]
 			user = Database.get_user(username)
+			logging.info("Ajax got custom user")
+		if not user:
+			logging.info("Inalid user requested by ajax: " + str(user))
+			return
 		logging.info(user)
-		obj = json.dumps({"username":user.username, "entries":user.entries, "pageName":user.page_name})
-		self.response.write(obj)
+		entries = []
+		for entry in user.entries:
+			entries.append({"title": entry.title, "content": entry.content})
+		obj = json.dumps({"username":user.username, "entries":entries, "pageName":user.page_name})
+		logging.info(str(obj))
+		self.response.write(str(obj))
 
 app = webapp2.WSGIApplication([
 	('/', MainHandler),

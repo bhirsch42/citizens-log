@@ -43,7 +43,7 @@ def add_user(page_name, username, password, email):
 	password_hash = make_password_hash(username, password)
 
 	# add user to datastore
-	my_user = MyUser(page_name=page_name, username=username, password_hash=password_hash, email=email)
+	my_user = MyUser(page_name=page_name, username=username, password_hash=password_hash, email=email, entries=[])
 	my_user.put()
 
 	# update memcache
@@ -97,6 +97,8 @@ def is_registered_user(user, update=False):
 
 
 def get_user(username):
+	if not username in get_all_users():
+		return None
 	return get_all_users()[username]
 
 
