@@ -17,10 +17,30 @@ function saveCSS() {
 	});
 };
 
+// Define function to stop people from leaving pages with entered text
+var confirmOnPageExit = function (e) {
+    // If we haven't been passed the event get the window.event
+    e = e || window.event;
+    var message = 'You have unsaved entries that will be lost.  Are you sure you want to leave this page?';
+    // For IE6-8 and Firefox prior to version 4
+    if (e) 
+    {
+        e.returnValue = message;
+    }
+    // For Chrome, Safari, IE8+ and Opera 12+
+    return message;
+};
+
+
 $("#markdown").on('input propertychange paste', function(event) {
 	var markup = $(this).val()
 	var converted = markdown.toHTML(markup)
 	$("#markdown-converted").html(converted)
+	// if ($(this).val() == '') {
+	// 	window.onbeforeunload = null;
+	// } else {
+	// 	window.onbeforeunload = confirmOnPageExit;
+	// }
 })
 
 var entryMenuDist = 15
@@ -36,6 +56,7 @@ function openEntry(id) {
 	selectEntry(id) 
 	openMoveEntryWrapper(id)
 	$( ":selected" ).promise().done(function() {
+		$("#" + id + ".entry-wrapper").find(".edit").css({visibility: "visible"}).animate({opacity: 100})
 		expandEntryWrapper(id)
 		expandEntryTitle(id)
 		// expandEntryContent(id)
@@ -93,6 +114,7 @@ function selectEntry(id) {
 function closeEntry(id) {
 	closeEntryWrapper(id)
 	$(".entry-wrapper").promise().done(function() {
+		$("#" + id + ".entry-wrapper").find(".edit").animate({opacity: 0}, function() {$(this).css({visibility: "hidden"})})
 		closeMoveEntryWrapper(id)
 	});
 }
@@ -218,6 +240,7 @@ function(event) {
 	}, hoverAnimationDuration)
 });
 
+
 // check registration form
 $("input.register[name=username]").on("click keyup", function(event) {
 	if (!/^[-_0-9a-zA-Z]{3,20}$/.test($(this).val())) {
@@ -263,9 +286,10 @@ function appendUserLogs(username, hashlist) {
 		// add entries
 		for (i = 0; i < user.entries.length; i++) {
 			var e = user.entries.length - i - 1
-			var $div = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
-			var $title = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-title", text: user.entries[e].title})
-			var $content = $("<div>", {id: "entry-" + i, name: "user/" + username + "/entry-" + i, class: "entry entry-content"}).html(markdown.toHTML(user.entries[e].content))
+			var $div = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
+			var $title = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-title", text: user.entries[e].title})
+			var $content = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-content"}).html(markdown.toHTML(user.entries[e].content))
+			$title.append("<a class=\"internal edit\" href=\"#!user/" + username + "/entry-" + e + "/edit\">Edit</a>")
 			$div.append($title)
 			$div.append($content)
 			// $a.append($div)
@@ -328,6 +352,17 @@ function appendUserLogs(username, hashlist) {
 			var trans = ui.value * diff
 			return trans
 		}
+
+		// bind link hover behavior
+		$("a").hover(function(event) {
+			$(this).animate({
+				"color": "white",
+			}, hoverAnimationDuration)},
+		function(event) {
+			$(this).animate({
+				"color": "#00e7ff",
+			}, hoverAnimationDuration)
+		});
 
 	})
 }
@@ -395,6 +430,30 @@ function hashChanged() {
 					$( ".screen" ).promise().done(function() {
 						openEntry(hashlist[2])
 					})
+					if (hashlist.length > 3 && hashlist[3] == 'edit') {
+						entry = $("#" + hashlist[2] + ".entry-wrapper")
+						var contentDiv = entry.find(".entry-content")
+						contentDiv.animate({opacity: 0}, function() {
+							$.get("/control/getuser?=" + hashlist[1], function(data) {
+								var markdownContent = JSON.parse(data).entries[parseInt(hashlist[2].split("-")[1])].content
+								var entryID = hashlist[2]
+								var s = "<div class=\"entry entry-content\"><table class=\"markdown\"><tr><td class=\"markdown\"><form method=\"POST\"><input name=\"form-type\" type=\"hidden\" value=\"edit\"><input name=\"entry-id\" type=\"hidden\" value=\"" + entryID + "\"><br>This editor uses <a href=\"http://daringfireball.net/projects/markdown/basics\" target=\"_blank\">Markdown</a>.  Click for details about formatting with Markdown.<textarea class=\"markdown\" id=\"markdown\" name=\"markdown\" rows=\"10\" required=\"required\">" + markdownContent + "</textarea><input type=\"submit\"/></form></td><td class=\"markdown\"><span class=\"markdown\" id=\"markdown-converted\"></span></td></tr></table></div>"
+								contentDiv.html(s)
+								contentDiv.animate({opacity: 100})
+								// bind markdown behavior
+								contentDiv.find("#markdown").on('input propertychange paste click', function(event) {
+									var markup = $(this).val()
+									var converted = markdown.toHTML(markup)
+									contentDiv.find("#markdown-converted").html(converted)
+									// if ($(this).val() == '') {
+									// 	window.onbeforeunload = null;
+									// } else {
+									// 	window.onbeforeunload = confirmOnPageExit;
+									// }
+								})
+							})
+						})
+					}
 				}
 			});
 		}
@@ -441,9 +500,21 @@ $(function() {
 		for (i = 0; i < users.length; i++) {
 			username = users[i].username
 			pageName = users[i].pageName
-			var s = "<a href=\"#!user/" + username + "\"><div class=\"browse-logs-option\"><div class=\"browse-logs-option-pagename\">" + pageName + "</div><div class=\"browse-logs-option-username\">" + username + "</div></div></a>"
+			var s = "<a class=\"browse-logs-link\" href=\"#!user/" + username + "\"><div class=\"browse-logs-option\"><div class=\"browse-logs-option-pagename\">" + pageName + "</div><div class=\"browse-logs-option-username\">" + username + "</div></div></a>"
 			$(".browse-logs-container").append(s)
 		}
+
+		// bind hover behavior
+		$(".browse-logs-option").hover(function(event) {
+			console.log("Hover browse option")
+			$(this).animate({
+				"background-color": "rgba(0, 231, 255, 0.2)",
+			}, hoverAnimationDuration)},
+		function(event) {
+			$(this).animate({
+				"background-color": "rgba(0, 231, 255, 0)",
+			}, hoverAnimationDuration)
+		});
 	})
 })
 

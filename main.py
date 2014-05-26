@@ -37,6 +37,8 @@ class MainHandler(Handler):
 			self.entry_post()
 		elif (form_type == 'register'):
 			self.register_post()
+		elif (form_type == 'edit'):
+			self.edit_post()
 
 	def login_post(self):
 		username = self.request.get('username')
@@ -59,6 +61,18 @@ class MainHandler(Handler):
 		Database.add_entry(self.get_user(), markdown)
 		s = str('#!user/' + self.get_user().username)
 		self.redirect(s)
+
+	def edit_post(self):
+		if not self.read_secure_cookie('user_id'):
+			s = str('#!login')
+			self.redirect(s)
+			return
+		markdown = self.request.get('markdown')
+		entry_id = self.request.get('entry-id')
+		entry_index = int(entry_id.split('-')[1])
+		Database.replace_entry_content(self.get_user(), markdown, entry_index)
+		s = str('#!user/' + self.get_user().username)
+		self.redirect(s)		
 
 	def register_post(self):
 		username_is_taken = False

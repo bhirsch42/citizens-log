@@ -66,6 +66,13 @@ def add_entry(user, content):
 	user.put()
 	update_user_memcache()
 
+def replace_entry_content(user, markdown, entry_index):
+	if (len(user.entries) <= entry_index):
+		return
+	user.entries[entry_index].content = markdown
+	user.put()
+	update_user_memcache()
+
 def get_all_users(update=False):
 	my_users = memcache.get(users_key)
 
