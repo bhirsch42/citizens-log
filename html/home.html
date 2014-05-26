@@ -55,14 +55,14 @@
 			My Log
 		</div>
 	</div>
-	<a href="#browse-logs">
+	<a class="internal" href="#browse-logs">
 		<div class="topbar-option-wrapper" style="left: 395px;">
 			<div class="topbar-option" id="browse-logs">
 				Browse Logs
 			</div>
 		</div>
 	</a>
-	<a href="#login">
+	<a class="internal" href="#login">
 		<div class="topbar-option-wrapper" style="left: 625;">
 			<div class="topbar-option" id="login">
 				Login
@@ -87,7 +87,7 @@
 				<br>
 				<input type="submit">{% if login_error %}<span class="error"> Username or password is invalid.</span>{% endif %}<br>
 				<br>
-				Don't have a log? <a href="#register">Make one</a>.
+				Don't have a log? <a class="internal" href="#register">Make one</a>.
 			</form>
 		</div>
 	</div>
@@ -145,7 +145,8 @@
 					<tr>
 						<td class="markdown">
 							<form method="POST">
-								<input name="form-type" type="hidden" value="entry">
+								<input name="form-type" type="hidden" value="entry"><br>
+								This editor uses <a href="http://daringfireball.net/projects/markdown/basics" target="_blank">Markdown</a>.  Click for details about formatting with Markdown.
 								<textarea class="markdown" id="markdown" name="markdown" rows="10" required="required"></textarea>
 								<input type="submit"/>
 							</form>

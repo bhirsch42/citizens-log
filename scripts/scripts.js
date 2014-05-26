@@ -334,12 +334,7 @@ function appendUserLogs(username, hashlist) {
 
 // Map urls to screen states with regex
 
-$("a").click(function(event) {
-	event.preventDefault();
-	setHash($(this).attr("href").split("#")[1]);
-});
-
-$("a").click(function(event) {
+$("a.internal").click(function(event) {
 	event.preventDefault();
 	setHash($(this).attr("href").split("#")[1]);
 });
