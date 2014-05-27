@@ -213,21 +213,18 @@ function getUsernameFromCookie() {
 hoverAnimationDuration = 100
 
 // toolbar options are hovered
+/*
 $(".topbar-option").hover(function(event) {
 	$(this).animate({
-		"background-color": "rgba(255, 255, 255, .2)",
 		"box-shadow": "0px 0px 1px black",
-		"color": "rgba(0, 231, 255, .5)",
-		"font-size":"17px"
+		"background": "rgba(51, 51, 51, 0.46)"
 	}, hoverAnimationDuration)},
 function(event) {
 	$(this).animate({
-		"background-color":" rgba(255, 255, 255, .2)",
 		"box-shadow": "0px 0px 5px black",
-		"color": "rgba(0, 0, 0, .5)",
-		"font-size":"18px"
 	}, hoverAnimationDuration)
 });
+*/
 
 // links are hovered
 $("a").hover(function(event) {

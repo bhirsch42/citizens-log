@@ -1,6 +1,7 @@
 <html>
 
 <head>
+	<link href='http://fonts.googleapis.com/css?family=Play:400,700' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="../stylesheets/style.css">
 	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -49,27 +50,28 @@
 <div class="screen-background"></div>
 
 <!-- topbar -->
-<div class="topbar-wrapper">
-	<div id="mylog" class="topbar-option-wrapper" style="left: 170px;">
-		<div class="topbar-option" id="my-log">
-			My Log
-		</div>
-	</div>
+<h1 class="mobiglas">MobiGlas</h1>
+<ul class="topbar-wrapper">
+	<li id="mylog" class="topbar-option-wrapper">
+		<button class="topbar-option minimal" id="my-log">
+			<span class="topbar-option-inner">My Log</span>
+		</button>
+	</li>
 	<a class="internal" href="#browse-logs">
-		<div class="topbar-option-wrapper" style="left: 395px;">
-			<div class="topbar-option" id="browse-logs">
-				Browse Logs
-			</div>
-		</div>
+		<li class="topbar-option-wrapper">
+			<button class="topbar-option minimal" id="browse-logs">
+				<span class="topbar-option-inner">Browse Logs</span>
+			</button>
+		</li>
 	</a>
 	<a class="internal" href="#login">
-		<div class="topbar-option-wrapper" style="left: 625;">
-			<div class="topbar-option" id="login">
-				Login
-			</div>
-		</div>
+		<li class="topbar-option-wrapper">
+			<button class="topbar-option minimal" id="login">
+				<span class="topbar-option-inner">Login</span>
+			</button>
+		</li>
 	</a>
-</div>
+</ul>
 
 
 <!-- screen -->
@@ -80,7 +82,7 @@
 			<form method="POST">
 				Username<br>
 				<input name="form-type" type="hidden" value="login">
-				<input class="input login" type="text" name="username" required="required"><br>
+				<input class="input login" type="text" name="username" required="required" autofocus><br>
 				<br>
 				Password<br>
 				<input class="input login" type="password" name="password" required="required"><br>

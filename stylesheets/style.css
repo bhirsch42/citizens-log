@@ -42,14 +42,26 @@ span.bg {
 	/*-webkit-filter: blur(5px);*/
 }
 
+input{
+	background: rgba(0, 80, 87, 0.46);
+	color: cyan;
+	border: 1px solid rgba(0, 235, 255, 0.3);
+	padding: 13px 33px 13px 13px;
+}
+
 div.screen {
-	position: absolute;
-	top: 121px;
-	bottom: 22px;
-	right: 22px;
-	left: 150px;
-	/*overflow: hidden;*/
-	/*outline: solid 1px #00e7ff;*/
+	/* position: absolute; */
+	/* top: 121px; */
+	/* bottom: 22px; */
+	/* right: 22px; */
+	/* left: 150px; */
+	overflow: hidden;
+	/* outline: solid 1px #00e7ff; */
+	float: right;
+	height: 80%;
+	width: 85%;
+	position: relative;
+	margin: 14px 13px 0 0;
 }
 
 div.screen-glow {
@@ -253,9 +265,7 @@ div.top-left-block {
 }
 
 div.top-fill-block{
-	position: absolute;
-	top: 20px;
-	left: 0;
+	float: left;
 	width: 100%;
 	height: 100px;
 	z-index: 5000;
@@ -282,40 +292,112 @@ a.myslider {
 
 /*topbar*/
 
-div.topbar-wrapper {
+.mobiglas{
+	font-family: 'Play', sans-serif;
+	text-shadow: 3px 3px 3px rgba(0, 231, 255, 1);
+	color: rgba(0, 173, 255, 0.09);
+	margin: 8px 13px;
+	float: left;
+}
+
+.topbar-wrapper {
 	position: absolute;
-	top: 20px;
-	right: 20px;
-	height: 100px;
-	width: 100%;
 	z-index: 5000;
+	margin: 0;
+	background: rgba(255, 255, 255, 0.18);
+	width: 519px;
+	right: 59px;
+	padding: 0 13px;
+	border: 1px solid rgba(190, 190, 190, 0.91);
+	-webkit-transform: skew(-45deg);
+	-moz-transform: skew(-45deg);
+	-o-transform: skew(-45deg);
 }
 
-div.topbar-option-wrapper {
-	position: absolute;
+.topbar-option-wrapper {
+	/*
 	top: 0px;
-	width: 300px;
-	height: 100px;
-	background: url("../res/darkaluminumbutton.png");
+	background: rgba(153, 153, 153, 0.82 url("../res/darkaluminumbutton.png"); 
+	margin: 0 13px;
+	*/
 	z-index: 5001;
+	position: relative;
+	list-style: none;
+	display: inline-block;
 }
 
-div.topbar-option {
-	z-index: 5002;
-	position: absolute;
-	vertical-align: middle;
+.topbar-option {
+	transition: 0.333s;
 	text-align: center;
-	top: 15px;
-	left: 100px;
-	width: 120px;
-	height: 50px;
+	height: 77px;
 	line-height: 50px;
+	/* background: rgba(51, 51, 51, 0.46); */
+	color: rgba(0, 0, 0, 0.498039);
+	font: bold 18px/1 arial, sans-serif;
+	padding: 44px;
+	/*
 	border-radius: 25px;
-	background-color: rgba(255, 255, 255, .2);
-	box-shadow: 0px 0px 5px black;
-	color: rgba(0, 0, 0, .5);
-	font-size: 18px;
+	background-color: rgba(255, 255, 255, .2);  
+	box-shadow: rgba(0, 0, 0, 0.8) 1px 1px 13px; */
 }
+	.topbar-option:hover{
+		color: rgba(0, 255, 255, 0.9); 
+		text-shadow: 0 -1px 0 #777;
+	}
+	.topbar-option-inner{
+		-webkit-transform: skew(0deg) !important;
+		-moz-transform: skew(0deg) !important;
+		-o-transform: skew(0deg) !important;
+	}
+
+button.punch {
+  background: #4162a8;
+  border-top: 1px solid #38538c;
+  border-right: 1px solid #1f2d4d;
+  border-bottom: 1px solid #151e33;
+  border-left: 1px solid #1f2d4d;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 6px 0 #1f3053, 0 8px 4px 1px #111111;
+  box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 6px 0 #1f3053, 0 8px 4px 1px #111111;
+  color: #fff;
+  font: bold 20px/1 "helvetica neue", helvetica, arial, sans-serif;
+  margin-bottom: 10px;
+  padding: 10px 0 12px 0;
+  text-align: center;
+  text-shadow: 0 -1px 1px #1e2d4d;
+  width: 150px;
+  -webkit-background-clip: padding-box; }
+  button.punch:hover {
+    -webkit-box-shadow: inset 0 0 20px 1px #87adff, 0 1px 0 #1d2c4d, 0 6px 0 #1f3053, 0 8px 4px 1px #111111;
+    box-shadow: inset 0 0 20px 1px #87adff, 0 1px 0 #1d2c4d, 0 6px 0 #1f3053, 0 8px 4px 1px #111111;
+    cursor: pointer; }
+  button.punch:active {
+    -webkit-box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111111;
+    box-shadow: inset 0 1px 10px 1px #5c8bee, 0 1px 0 #1d2c4d, 0 2px 0 #1f3053, 0 4px 3px 0 #111111;
+    margin-top: 13px; }
+
+button.minimal {
+  background: rgba(99, 99, 99, 0.2);
+  border: 1px solid #3B3D46;
+  -webkit-box-shadow: inset 0 0 1px 1px #f6f6f6;
+  box-shadow: inset 0 0 1px 1px #f6f6f6;
+  /* color: #333; 
+  text-shadow: 0 1px 0 #fff; 
+  font: bold 12px/1 "helvetica neue", helvetica, arial, sans-serif;
+  padding: 8px 0 9px; 
+  text-align: center;
+  width: 150px; */ }
+  button.minimal:hover {
+	border: 1px solid rgb(0, 184, 255);
+	 background: #05353A url("../res/holo.png");
+    -webkit-box-shadow: inset 0 0 1px 1px #eaeaea;
+    box-shadow: inset 0 0 1px 1px #eaeaea;
+    cursor: pointer; }
+  button.minimal:active {
+	background: rgba(99, 99, 99, 0.88);
+    -webkit-box-shadow: inset 0 0 1px 1px #e3e3e3;
+    box-shadow: inset 0 0 1px 1px #e3e3e3;
+  	border: 0;}
 
 div.account-entry-wrapper {
 	position: absolute;
