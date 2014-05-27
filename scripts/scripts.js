@@ -19,16 +19,16 @@ function saveCSS() {
 
 // Define function to stop people from leaving pages with entered text
 var confirmOnPageExit = function (e) {
-    // If we haven't been passed the event get the window.event
-    e = e || window.event;
-    var message = 'You have unsaved entries that will be lost.  Are you sure you want to leave this page?';
-    // For IE6-8 and Firefox prior to version 4
-    if (e) 
-    {
-        e.returnValue = message;
-    }
-    // For Chrome, Safari, IE8+ and Opera 12+
-    return message;
+	// If we haven't been passed the event get the window.event
+	e = e || window.event;
+	var message = 'You have unsaved entries that will be lost.  Are you sure you want to leave this page?';
+	// For IE6-8 and Firefox prior to version 4
+	if (e) 
+	{
+		e.returnValue = message;
+	}
+	// For Chrome, Safari, IE8+ and Opera 12+
+	return message;
 };
 
 
@@ -289,7 +289,9 @@ function appendUserLogs(username, hashlist) {
 			var $div = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
 			var $title = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-title", text: user.entries[e].title})
 			var $content = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-content"}).html(markdown.toHTML(user.entries[e].content))
-			$title.append("<a class=\"internal edit\" href=\"#!user/" + username + "/entry-" + e + "/edit\">Edit</a>")
+			if (username == getUsernameFromCookie()) {
+				$title.append("<a class=\"internal edit\" href=\"#!user/" + username + "/entry-" + e + "/edit\">Edit</a>")
+			}
 			$div.append($title)
 			$div.append($content)
 			// $a.append($div)
@@ -437,7 +439,7 @@ function hashChanged() {
 							$.get("/control/getuser?=" + hashlist[1], function(data) {
 								var markdownContent = JSON.parse(data).entries[parseInt(hashlist[2].split("-")[1])].content
 								var entryID = hashlist[2]
-								var s = "<div class=\"entry entry-content\"><table class=\"markdown\"><tr><td class=\"markdown\"><form method=\"POST\"><input name=\"form-type\" type=\"hidden\" value=\"edit\"><input name=\"entry-id\" type=\"hidden\" value=\"" + entryID + "\"><br>This editor uses <a href=\"http://daringfireball.net/projects/markdown/basics\" target=\"_blank\">Markdown</a>.  Click for details about formatting with Markdown.<textarea class=\"markdown\" id=\"markdown\" name=\"markdown\" rows=\"10\" required=\"required\">" + markdownContent + "</textarea><input type=\"submit\"/></form></td><td class=\"markdown\"><span class=\"markdown\" id=\"markdown-converted\"></span></td></tr></table></div>"
+								var s = "<div class=\"entry entry-content\"><table class=\"markdown\"><tr><td class=\"markdown\"><form method=\"POST\"><input name=\"form-type\" type=\"hidden\" value=\"edit\"><input name=\"entry-id\" type=\"hidden\" value=\"" + entryID + "\"><br>This editor uses <a href=\"http://daringfireball.net/projects/markdown/basics\" target=\"_blank\">Markdown</a>.  Click for details about formatting with Markdown.<textarea class=\"markdown\" id=\"markdown\" name=\"markdown\" rows=\"10\" required=\"required\">" + markdownContent + "</textarea><input type=\"submit\"/ class=\"submit\"><br><!-- <span class=\"delete\">Delete</span> --></form></td><td class=\"markdown\"><span class=\"markdown\" id=\"markdown-converted\"></span></td></tr></table></div>"
 								contentDiv.html(s)
 								contentDiv.animate({opacity: 100})
 								// bind markdown behavior
@@ -445,12 +447,25 @@ function hashChanged() {
 									var markup = $(this).val()
 									var converted = markdown.toHTML(markup)
 									contentDiv.find("#markdown-converted").html(converted)
-									// if ($(this).val() == '') {
-									// 	window.onbeforeunload = null;
-									// } else {
-									// 	window.onbeforeunload = confirmOnPageExit;
-									// }
 								})
+								// bind delete button behavior
+								// deleteButton = $(".delete")
+								// deleteButton.hover(function() {
+								// 	$(this).animate({
+								// 		"color": "white",
+								// 		"background-color": "rgba(255,0,0,1)"
+								// 	}, hoverAnimationDuration)
+								// }, function() {
+								// 	$(this).animate({
+								// 		"color": "red",
+								// 		"background-color": "rgba(0,231,255,.2)"
+								// 	}, hoverAnimationDuration)
+								// })
+								// deleteButton.click(function() {
+								// 	if (window.confirm("Are you sure you want to delete this entry?")) {
+								// 		$.post("/control/deleteentry")
+								// 	}
+								// })
 							})
 						})
 					}
@@ -525,7 +540,7 @@ $(function() {
 });
 
 $(window).on('hashchange',function(){ 
-    hashChanged()
+	hashChanged()
 });
 
 }
