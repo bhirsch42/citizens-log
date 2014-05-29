@@ -20,7 +20,6 @@ import Database
 import urlparse
 import mimetypes
 import re
-import logging
 import json
 
 class MainHandler(Handler):
@@ -30,7 +29,6 @@ class MainHandler(Handler):
 
 	def post(self):
 		form_type = self.request.get("form-type")
-		logging.error("Form type: " + form_type)
 		if (form_type == 'login'):
 			self.login_post()
 		elif (form_type == 'entry'):
@@ -80,7 +78,6 @@ class MainHandler(Handler):
 		username_is_invalid = False
 
 		username = self.request.get('username')
-		logging.info("Username: " + username)
 		password = self.request.get('password')
 		password_repeat = self.request.get('password-repeat')
 		email = self.request.get('email')
@@ -92,9 +89,7 @@ class MainHandler(Handler):
 			passwords_dont_match = True
 		if re.match("^[a-zA-Z0-9_-]{3,20}$", username) is None:
 			username_is_invalid = True
-			logging.info("Invalid username: " + username)
 		if username_is_taken or passwords_dont_match or username_is_invalid:
-			logging.info("Invalid registration attempted.")
 			self.render_home(passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid)
 			return
 		Database.add_user(page_name, username, password, email)
@@ -117,25 +112,19 @@ class MainHandler(Handler):
 
 class GetUserHandler(Handler):
 	def get(self):
-		logging.info("Ajax requested user.")
 		query_list = self.request.query_string.split('=')
 		user = None
 		if len(query_list) < 2:
 			user = self.get_user()
-			logging.info("Ajax got logged-in user")
 		else:
 			username = query_list[1]
 			user = Database.get_user(username)
-			logging.info("Ajax got custom user")
 		if not user:
-			logging.info("Inalid user requested by ajax: " + str(user))
 			return
-		logging.info(user)
 		entries = []
 		for entry in user.entries:
 			entries.append({"title": entry.title, "content": entry.content})
 		obj = json.dumps({"username":user.username, "entries":entries, "pageName":user.page_name})
-		logging.info(str(obj))
 		self.response.write(str(obj))
 
 class GetAllUsersHandler(Handler):
@@ -143,7 +132,6 @@ class GetAllUsersHandler(Handler):
 		users = []
 		for username in Database.get_all_users():
 			user = Database.get_user(username)
-			# logging.error(user.username)
 			users.append({"username": user.username, "pageName": user.page_name})
 		obj = json.dumps(users)
 		self.response.write(str(obj))
