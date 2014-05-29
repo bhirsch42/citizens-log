@@ -32,15 +32,30 @@ var confirmOnPageExit = function (e) {
 };
 
 
-$("#markdown").on('input propertychange paste', function(event) {
-	var markup = $(this).val()
+function myToHtml(markup) {
 	var converted = markdown.toHTML(markup)
-	$("#markdown-converted").html(converted)
-	// if ($(this).val() == '') {
-	// 	window.onbeforeunload = null;
-	// } else {
-	// 	window.onbeforeunload = confirmOnPageExit;
-	// }
+	// console.log(converted)
+	$(converted).find('a:contains("youtube")').each(function() {
+		var ytLink = $(this)[0].outerHTML
+		var match = ytLink.match(/watch\?v=([a-zA-Z0-9\-_]+)/);
+		if (match) {
+			var vidID = match[0].split('watch?v=')[1]
+			converted = converted.replace(ytLink, youtubeEmbed(vidID))
+		}
+	})
+	return converted
+}
+
+$("textarea#markdown-entry").on('click input propertychange paste', function(event) {
+	var markup = $(this).val()
+	var converted = myToHtml(markup)
+	$("#markdown-entry-converted").html(converted)
+})
+
+$("textarea#markdown-help").on('click input propertychange paste', function(event) {
+	var markup = $(this).val()
+	var converted = myToHtml(markup)
+	$("#markdown-help-converted").html(converted)
 })
 
 var entryMenuDist = 15
@@ -48,11 +63,11 @@ var entryAnimationDuration = 300
 
 function openEntry(id) {
 	var title = $(".page-title")
-	if (title.css("opacity") > 0) {
+	// if (title.css("opacity") > 0) {
 		// $( ".screen" ).promise().done(function() {
-			title.animate({opacity: ".1"})
+	title.animate({opacity: ".1"})
 		// })
-	}
+	// }
 	selectEntry(id) 
 	openMoveEntryWrapper(id)
 	$( ":selected" ).promise().done(function() {
@@ -278,7 +293,11 @@ function appendUserLogs(username, hashlist) {
 		// set visibility of "create entry" option
 		var createEntryVisible = getUsernameFromCookie() == username
 		if (createEntryVisible) {
-			$("#create-entry").css({visibility: "visible"})
+			$("#create-entry").css({
+				visibility: "visible",
+				top: 0
+			})
+
 		} else {
 			$("#create-entry").css({visibility: "hidden"})
 		}
@@ -332,6 +351,7 @@ function appendUserLogs(username, hashlist) {
 			});
 		}
 
+		lastTrans = 0;
 		$(function() {
 			$( "#slider-vertical" ).slider({
 				orientation: "vertical",
@@ -365,6 +385,18 @@ function appendUserLogs(username, hashlist) {
 				"color": "#00e7ff",
 			}, hoverAnimationDuration)
 		});
+
+		// bind image hover behavior
+		$("img").hover(function(event) {
+			$(this).animate({
+				"opacity": "1",
+			}, hoverAnimationDuration)},
+		function(event) {
+			$(this).animate({
+				"opacity": ".8",
+			}, hoverAnimationDuration)
+		});
+
 
 	})
 }
@@ -432,6 +464,7 @@ function hashChanged() {
 					$( ".screen" ).promise().done(function() {
 						openEntry(hashlist[2])
 					})
+					// edit entry
 					if (hashlist.length > 3 && hashlist[3] == 'edit') {
 						entry = $("#" + hashlist[2] + ".entry-wrapper")
 						var contentDiv = entry.find(".entry-content")
@@ -506,6 +539,20 @@ function hashChanged() {
 		})
 		return
 	}
+
+	if (/^markdown\-help$/.test(hashlist[0])) {
+		closeSelectedEntry()
+		$(".page-title").animate({opacity: "1"})
+		// update conversion
+		var obj = $("textarea#markdown-help")
+		var markup = obj.val()
+		var converted = myToHtml(markup)
+		$("#markdown-help-converted").html(converted)
+		$( ".entry" ).promise().done(function() {		
+			openEntry('markdown-help')
+		})
+		return
+	}
 }
 
 // Generate the "Browse Logs" entry
@@ -532,6 +579,13 @@ $(function() {
 		});
 	})
 })
+
+// generate youtube embed code from url
+function youtubeEmbed(vidID){
+	var embed = '<iframe width="420" height="315" src="//www.youtube.com/embed/' + vidID + '" frameborder="0" allowfullscreen></iframe>'
+	embed = embed.replace('watch?v=', 'embed/')
+	return embed
+}
 
 // On load, go to specified URL and save animation locations
 $(function() {

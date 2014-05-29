@@ -98,7 +98,9 @@ class MainHandler(Handler):
 			self.render_home(passwords_dont_match=passwords_dont_match, username_is_taken=username_is_taken, username_is_invalid=username_is_invalid)
 			return
 		Database.add_user(page_name, username, password, email)
-		self.redirect('#!accountcreated')
+		self.login(Database.get_user(username))
+		s = str('#!user/' + username)
+		self.redirect(s)
 
 # class LoginHandler(Handler):
 # 	def get(self):

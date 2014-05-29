@@ -74,6 +74,65 @@
 
 <!-- screen -->
 <div class="screen">
+<!-- markdown help -->
+	<div class="entry entry-wrapper markdown-help-wrapper" id="markdown-help">
+		<div class="markdown-help-container" id="markdown-help">
+			<table class="markdown">
+				<tr>
+					<td class="markdown">
+						MobiLog uses a modified version of Markdown.  You can view examples and test your own here.
+<textarea class="markdown" id="markdown-help" name="markdown" rows="10" required="required">
+---
+##Decorations
+---
+*Italics*
+
+**Bold**
+
+---
+##Headings
+---
+
+#Heading 1
+#Heading 2
+#Heading 3
+#Heading 4
+#Heading 5
+
+---
+##Lists
+---
+- First
+  - Sub-first
+- Second
+- Third
+
+---
+##Links and Images
+---
+[Roberts Space Industries](https://robertsspaceindustries.com/)
+
+![](https://robertsspaceindustries.com/rsi/static/images/rsilogo.png)
+
+---
+##Embeds
+Note: The leading tags are important.
+
+---
+Don't use an embed url.  Use the url from the YouTube page.
+
+[youtube](https://www.youtube.com/watch?v=UvDs7RDKCag)
+
+[soundcloud](https://soundcloud.com/caden-l-welborn/star-citizen-opening-main)
+</textarea>
+					</td>
+					<td class="markdown">
+						<span class="markdown" id="markdown-help-converted"></span>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 <!-- login window (hidden by default) -->
 	<div class="entry entry-wrapper account-entry-wrapper" id="login">
 		<div class="login-container" id="login">
@@ -146,13 +205,13 @@
 						<td class="markdown">
 							<form method="POST">
 								<input name="form-type" type="hidden" value="entry"><br>
-								This editor uses <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">Markdown</a>.  Click for details about formatting with Markdown.
-								<textarea class="markdown" id="markdown" name="markdown" rows="10" required="required"></textarea>
+								This editor uses a modified version of <a href="#markdown-help" class="internal">Markdown</a>.  Click for details about formatting with Markdown.
+								<textarea class="markdown" id="markdown-entry" name="markdown" rows="10" required="required"></textarea>
 								<input type="submit"/>
 							</form>
 						</td>
 						<td class="markdown">
-							<span class="markdown" id="markdown-converted"></span>
+							<span class="markdown" id="markdown-entry-converted"></span>
 						</td>
 					</tr>
 				</table>
@@ -165,7 +224,7 @@
 	</div>
 </div>
 
-
+<div class="footer">MobiLog v1.1</div>
 
 </body>
 </html>

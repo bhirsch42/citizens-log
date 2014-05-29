@@ -5,6 +5,7 @@ import hashlib
 import random
 from string import letters
 import time
+import datetime
 
 users_key = "users"
 
@@ -12,6 +13,7 @@ users_key = "users"
 class Entry(ndb.Model):
 	title = ndb.StringProperty(required=True)
 	content = ndb.TextProperty(required=True)
+	date_and_time = ndb.DateTimeProperty(auto_now_add=True)
 
 
 class MyUser(ndb.Model):
@@ -20,6 +22,7 @@ class MyUser(ndb.Model):
 	password_hash = ndb.StringProperty(required=True)
 	email = ndb.StringProperty(required=False)
 	entries = ndb.StructuredProperty(Entry, repeated=True)
+	date_and_time = ndb.DateTimeProperty(required=True, auto_now_add=True)
 
 def make_salt(length = 5):
 	return ''.join(random.choice(letters) for x in xrange(length))
