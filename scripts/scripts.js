@@ -32,7 +32,7 @@ var confirmOnPageExit = function (e) {
 };
 
 
-function myToHtml(markup) {
+function convertEmbeds(markup) {
 	var converted = markdown.toHTML(markup)
 	// console.log(converted)
 	$(converted).find('a:contains("youtube")').each(function() {
@@ -45,18 +45,6 @@ function myToHtml(markup) {
 	})
 	return converted
 }
-
-$("textarea#markdown-entry").on('click input propertychange paste', function(event) {
-	var markup = $(this).val()
-	var converted = myToHtml(markup)
-	$("#markdown-entry-converted").html(converted)
-})
-
-$("textarea#markdown-help").on('click input propertychange paste', function(event) {
-	var markup = $(this).val()
-	var converted = myToHtml(markup)
-	$("#markdown-help-converted").html(converted)
-})
 
 var entryMenuDist = 15
 var entryAnimationDuration = 300
@@ -307,7 +295,7 @@ function appendUserLogs(username, hashlist) {
 			var e = user.entries.length - i - 1
 			var $div = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-wrapper", style:"top:" + 22*(i+createEntryVisible)+"px"});
 			var $title = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-title", text: user.entries[e].title})
-			var $content = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-content"}).html(markdown.toHTML(user.entries[e].content))
+			var $content = $("<div>", {id: "entry-" + e, name: "user/" + username + "/entry-" + e, class: "entry entry-content"}).html(user.entries[e].content)
 			if (username == getUsernameFromCookie()) {
 				$title.append("<a class=\"internal edit\" href=\"#!user/" + username + "/entry-" + e + "/edit\">Edit</a>")
 			}
@@ -470,35 +458,13 @@ function hashChanged() {
 						var contentDiv = entry.find(".entry-content")
 						contentDiv.animate({opacity: 0}, function() {
 							$.get("/control/getuser?=" + hashlist[1], function(data) {
-								var markdownContent = JSON.parse(data).entries[parseInt(hashlist[2].split("-")[1])].content
+								var content = JSON.parse(data).entries[parseInt(hashlist[2].split("-")[1])].content
 								var entryID = hashlist[2]
-								var s = "<div class=\"entry entry-content\"><table class=\"markdown\"><tr><td class=\"markdown\"><form method=\"POST\"><input name=\"form-type\" type=\"hidden\" value=\"edit\"><input name=\"entry-id\" type=\"hidden\" value=\"" + entryID + "\"><br>This editor uses <a href=\"http://daringfireball.net/projects/markdown/basics\" target=\"_blank\">Markdown</a>.  Click for details about formatting with Markdown.<textarea class=\"markdown\" id=\"markdown\" name=\"markdown\" rows=\"10\" required=\"required\">" + markdownContent + "</textarea><input type=\"submit\"/ class=\"submit\"><br><!-- <span class=\"delete\">Delete</span> --></form></td><td class=\"markdown\"><span class=\"markdown\" id=\"markdown-converted\"></span></td></tr></table></div>"
+								var s = "<form method=\"POST\"><input name=\"form-type\" type=\"hidden\" value=\"edit\"><input name=\"entry-id\" type=\"hidden\" value=\"" + entryID + "\"><textarea name=\"content\">" + content + "</textarea><input type=\"submit\"/ class=\"submit\"><br><!-- <span class=\"delete\">Delete</span> --></form>"
 								contentDiv.html(s)
+								initTinyMCE()
 								contentDiv.animate({opacity: 100})
 								// bind markdown behavior
-								contentDiv.find("#markdown").on('input propertychange paste click', function(event) {
-									var markup = $(this).val()
-									var converted = markdown.toHTML(markup)
-									contentDiv.find("#markdown-converted").html(converted)
-								})
-								// bind delete button behavior
-								// deleteButton = $(".delete")
-								// deleteButton.hover(function() {
-								// 	$(this).animate({
-								// 		"color": "white",
-								// 		"background-color": "rgba(255,0,0,1)"
-								// 	}, hoverAnimationDuration)
-								// }, function() {
-								// 	$(this).animate({
-								// 		"color": "red",
-								// 		"background-color": "rgba(0,231,255,.2)"
-								// 	}, hoverAnimationDuration)
-								// })
-								// deleteButton.click(function() {
-								// 	if (window.confirm("Are you sure you want to delete this entry?")) {
-								// 		$.post("/control/deleteentry")
-								// 	}
-								// })
 							})
 						})
 					}
@@ -587,14 +553,27 @@ function youtubeEmbed(vidID){
 	return embed
 }
 
+function initTinyMCE() {
+	tinymce.init({
+		selector:'textarea',
+		skin: 'logentry',
+
+		plugins: "image, media, hr"
+	});
+
+}
+
 // On load, go to specified URL and save animation locations
 $(function() {
 	hashChanged()
 	saveCSS()
+	hashChanged()
+	initTinyMCE()
 });
 
 $(window).on('hashchange',function(){ 
 	hashChanged()
 });
+
 
 }

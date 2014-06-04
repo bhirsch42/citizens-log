@@ -15,7 +15,6 @@ class Entry(ndb.Model):
 	content = ndb.TextProperty(required=True)
 	date_and_time = ndb.DateTimeProperty(auto_now_add=True)
 
-
 class MyUser(ndb.Model):
 	page_name = ndb.StringProperty(required=True)
 	username = ndb.StringProperty(required=True)
@@ -112,5 +111,3 @@ def get_user(username):
 	if not username in get_all_users():
 		return None
 	return get_all_users()[username]
-
-

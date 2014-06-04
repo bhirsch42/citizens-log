@@ -11,6 +11,9 @@ handlers:
 - url: /scripts
   static_dir: scripts
 
+- url: /tinymce
+  static_dir: tinymce
+
 - url: /res
   static_dir: res
 

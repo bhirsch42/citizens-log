@@ -106,9 +106,10 @@ div.entry-content {
 	position: absolute;
 	/*height: auto;*/
 	width: auto;
-	left: 5px;
+	left: 0px;
 	right: 0px;
-	padding-right: 12px;
+	/*padding-right: 12px;*/
+	padding: 5px;
 }
 
 div.myscroll {
@@ -160,7 +161,7 @@ div.top-left-corner {
 }
 
 div.left-side {
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 	position: absolute;
 	left: 0;
 	top: 100px;
@@ -170,17 +171,17 @@ div.left-side {
     z-index: 9998;
 }
 div.right-side {
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 	position: absolute;
 	right: 0;
     width: 0;
     height: 100%;
     border-right: solid transparent 20px;
-    z-index: 9998;
+    z-index: 4999;
 }
 
 div.bottom {
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 	position: absolute;
 	bottom: 0;
 	right: 0;
@@ -191,7 +192,7 @@ div.bottom {
 }
 
 div.top-left-bar {
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 	position: absolute;
 	top: 100px;
 	left: 20px;
@@ -215,7 +216,7 @@ div.top-left-inner-corner {
 }
 
 div.top-bar {
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 	position: absolute;
 	top: 0;
 	/*left: 242px;*/
@@ -259,7 +260,7 @@ div.top-fill-block{
 	width: 100%;
 	height: 100px;
 	z-index: 5000;
-	background: url("../res/aluminum.jpg");
+	background: url("../res/aluminum_small.jpeg");
 }
 
 /*slider*/
@@ -353,7 +354,6 @@ span.markdown {
 }
 
 .entry-wrapper#create-entry {
-	top: 0px;
 	visibility: hidden;
 }
 
@@ -468,6 +468,11 @@ input[type=submit] {
 	font-weight: bold;
 	padding: 13px 33px;
 }
+
 .create-entry-submit{
 	margin: 3px 0;
+}
+
+iframe {
+	border: solid 1px rgba(0, 231, 255, .2);
 }

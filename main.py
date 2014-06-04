@@ -55,8 +55,8 @@ class MainHandler(Handler):
 			s = str('#!login')
 			self.redirect(s)
 			return
-		markdown = self.request.get('markdown')
-		Database.add_entry(self.get_user(), markdown)
+		content = self.request.get('content')
+		Database.add_entry(self.get_user(), content)
 		s = str('#!user/' + self.get_user().username)
 		self.redirect(s)
 
@@ -65,10 +65,10 @@ class MainHandler(Handler):
 			s = str('#!login')
 			self.redirect(s)
 			return
-		markdown = self.request.get('markdown')
+		content = self.request.get('content')
 		entry_id = self.request.get('entry-id')
 		entry_index = int(entry_id.split('-')[1])
-		Database.replace_entry_content(self.get_user(), markdown, entry_index)
+		Database.replace_entry_content(self.get_user(), content, entry_index)
 		s = str('#!user/' + self.get_user().username)
 		self.redirect(s)		
 
@@ -97,19 +97,6 @@ class MainHandler(Handler):
 		s = str('#!user/' + username)
 		self.redirect(s)
 
-# class LoginHandler(Handler):
-# 	def get(self):
-# 		self.render_home()
-
-# 	def post(self):
-# 		self.write("LoginHandler")
-
-# class RegisterHandler(Handler):
-# 	def get(self):
-# 		self.render_home()
-# 	def post(self):
-
-
 class GetUserHandler(Handler):
 	def get(self):
 		query_list = self.request.query_string.split('=')
@@ -136,8 +123,20 @@ class GetAllUsersHandler(Handler):
 		obj = json.dumps(users)
 		self.response.write(str(obj))
 
+class EntryEditorHandler(Handler):
+	def get(self):
+		self.render("entry_editor.html", users=[Database.get_user(u) for u in Database.get_all_users()])
+	def post(self):
+		username = self.request.get('username')
+		content = self.request.get('content')
+		entry_id = self.request.get('entry-id')
+		entry_index = int(entry_id)
+		Database.replace_entry_content(Database.get_user(username), content, entry_index)
+		self.redirect('/entryeditor')
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/control/getuser', GetUserHandler),
 	('/control/getallusers', GetAllUsersHandler)
+	# ('/entryeditor', EntryEditorHandler)
 ], debug=True)
