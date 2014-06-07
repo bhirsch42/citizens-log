@@ -1,0 +1,18 @@
+.panel {
+	position: absolute;
+	overflow: visible !important;
+}
+
+.inner-panel {
+	position: absolute;
+	border: solid 1px #00e7ff;
+	opacity: 10%;
+	background-color: rgba(0, 231, 255, .2);
+	border-radius: 5px;
+	top: 5px;
+	left: 5px;
+	bottom: 5px;
+	right: 5px;
+	padding: 10px;
+	overflow: hidden;
+}

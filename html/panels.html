@@ -1,0 +1,67 @@
+<div class="panel" id="login" style="top: -30px; left: 650px; width: 129px; height: 20px;">
+	<div class="inner-panel">
+		<form method="POST">
+			Username<br>
+			<input name="form-type" type="hidden" value="login">
+			<input class="input login" type="text" name="username" required="required"><br>
+			<br>
+			Password<br>
+			<input class="input login" type="password" name="password" required="required"><br>
+			<br>
+			<input type="submit"><span class="error"></span>
+			<br>
+		</form>
+		Don't have a log? <a class="internal" href="#register">Make one</a>.
+	</div>
+</div>
+
+<div class="panel" id="register">
+	<div class="inner-panel">
+		<form method="POST">
+			<input name="form-type" type="hidden"value="register">
+			Username<br>
+			<input class="input register" type="text" name="username" required="required">
+			<div class="username-error"></div>
+			<br>
+			Password<br>
+			<input class="input register" type="password" name="password" required="required">
+			<br>
+			Repeat password<br>
+			<input class="input register" type="password" name="password-repeat" required="required"><br>
+			<br>
+			Name of Log<br>
+			<input class="input register" type="text" name="page-name" required="required"><br>
+			<br>
+			Email (For password recovery only)<br>
+			<input class="input register" type="text" name="email"><br>
+			<br>
+			<input type="submit"><br>
+		</form>
+	</div>
+</div>
+
+<div class="panel" id="account-created">
+	<div class="inner-panel">
+		Account created successfully.
+	</div>
+</div>
+
+<div class="panel" id="browse" style="top: -30px; left: 420px; width: 129px; height: 20px;">
+	<div class="inner-panel">
+
+	</div>
+</div>
+
+<div class="panel" id="create-entry">
+	<div class="inner-panel">
+		<div class="title">
+			Create Entry
+		</div>
+		<form method="POST">
+			<textarea name="content"></textarea>
+			<input type="submit"/>
+			<input name="form-type" type="hidden" value="entry"><br>
+		</form>
+	</div>
+</div>
+

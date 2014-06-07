@@ -21,6 +21,7 @@ import urlparse
 import mimetypes
 import re
 import json
+import logging
 
 class MainHandler(Handler):
 	def get(self):
@@ -37,18 +38,6 @@ class MainHandler(Handler):
 			self.register_post()
 		elif (form_type == 'edit'):
 			self.edit_post()
-
-	def login_post(self):
-		username = self.request.get('username')
-		password = self.request.get('password')
-		if (Database.valid_password(username, password)):
-			self.login(Database.get_user(username))
-		else:
-			self.render_home(login_error=True)
-			return
-		s = str('#!user/' + username)
-		self.redirect(s)
-
 
 	def entry_post(self):
 		if not self.read_secure_cookie('user_id'):
@@ -134,9 +123,29 @@ class EntryEditorHandler(Handler):
 		Database.replace_entry_content(Database.get_user(username), content, entry_index)
 		self.redirect('/entryeditor')
 
+class PanelsHTMLHandler(Handler):
+	def get(self):
+		self.render('panels.html')
+
+class LoginHandler(Handler):
+	def get(self):
+		pass
+	def post(self):
+		username = self.request.get('username')
+		password = self.request.get('password')
+		logging.info(username + ", " + password)
+		if (Database.valid_password(username, password)):
+			self.login(Database.get_user(username))
+			self.response.out.write("Success")
+		else:
+			self.response.out.write("Failure")
+
+
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/control/getuser', GetUserHandler),
-	('/control/getallusers', GetAllUsersHandler)
+	('/control/getallusers', GetAllUsersHandler),
+	('/control/login', LoginHandler),
+	('/static/panelsHTML', PanelsHTMLHandler)
 	# ('/entryeditor', EntryEditorHandler)
 ], debug=True)

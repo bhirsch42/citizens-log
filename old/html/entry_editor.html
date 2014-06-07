@@ -1,0 +1,28 @@
+<html>
+
+<body>
+
+{% for user in users %}
+
+	<h1>{{user.username}}</h1><br>
+
+	{% for i in range(user.entries|length) %}
+		<form method="POST">
+			{{user.entries[i].title}}<br>
+			<input name="entry-id" type="hidden" value="{{i}}">
+			<input name="username" type="hidden" value="{{user.username}}">
+			<textarea name="content">{{user.entries[i].content}}</textarea><br>
+			<input type="submit"><br>
+		</form><br>
+		<br>
+		<br>
+		<br>
+	{% endfor %}
+
+	<hr>
+
+{% endfor %}
+
+</body>
+
+</html>

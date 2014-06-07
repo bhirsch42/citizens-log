@@ -10,18 +10,32 @@ import datetime
 users_key = "users"
 
 
-class Entry(ndb.Model):
-	title = ndb.StringProperty(required=True)
-	content = ndb.TextProperty(required=True)
-	date_and_time = ndb.DateTimeProperty(auto_now_add=True)
-
 class MyUser(ndb.Model):
-	page_name = ndb.StringProperty(required=True)
 	username = ndb.StringProperty(required=True)
 	password_hash = ndb.StringProperty(required=True)
 	email = ndb.StringProperty(required=False)
+	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
+	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
+	pages = ndb.StructuredProperty(Page, repeated=True)
+	pages_of_interest = ndb.StructuredProperty(PageOfInterest, repeated=True)
+
+class PageOfInterest(ndb.Model):
+	username = ndb.StringProperty(required=True)
+	pagename = ndb.StringProperty(required=True)
+
+class Page(ndb.Model):
+	name = ndb.StringProperty(required=True)
 	entries = ndb.StructuredProperty(Entry, repeated=True)
-	date_and_time = ndb.DateTimeProperty(required=True, auto_now_add=True)
+	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
+	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
+	poi_num = ndb.IntegerProperty(required=True)
+
+
+class Entry(ndb.Model):
+	title = ndb.StringProperty(required=True)
+	content = ndb.TextProperty(required=True)
+	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
+	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
 
 def make_salt(length = 5):
 	return ''.join(random.choice(letters) for x in xrange(length))
