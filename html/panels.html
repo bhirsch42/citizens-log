@@ -1,4 +1,4 @@
-<div class="panel" id="login" style="top: -30px; left: 650px; width: 129px; height: 20px;">
+<div class="panel" id="login">
 	<div class="inner-panel">
 		<form method="POST">
 			Username<br>
@@ -8,29 +8,28 @@
 			Password<br>
 			<input class="input login" type="password" name="password" required="required"><br>
 			<br>
-			<input type="submit"><span class="error"></span>
+			<input type="submit"><span class="error" id="username-password"></span>
 			<br>
 		</form>
-		Don't have a log? <a class="internal" href="#register">Make one</a>.
+		Don't have a log? <a class="internal" href="#!register">Make one</a>.
 	</div>
 </div>
 
 <div class="panel" id="register">
 	<div class="inner-panel">
 		<form method="POST">
-			<input name="form-type" type="hidden"value="register">
 			Username<br>
 			<input class="input register" type="text" name="username" required="required">
-			<div class="username-error"></div>
+			<span class="error" id="username-is-invalid"></span>
+			<span class="error" id="username-is-taken"></span><br>
 			<br>
 			Password<br>
-			<input class="input register" type="password" name="password" required="required">
+			<input class="input register" type="password" name="password" required="required"><br>
 			<br>
 			Repeat password<br>
-			<input class="input register" type="password" name="password-repeat" required="required"><br>
+			<input class="input register" type="password" name="password-repeat" required="required">
+			<span class="error" id="passwords-dont-match"></span>
 			<br>
-			Name of Log<br>
-			<input class="input register" type="text" name="page-name" required="required"><br>
 			<br>
 			Email (For password recovery only)<br>
 			<input class="input register" type="text" name="email"><br>
@@ -42,7 +41,8 @@
 
 <div class="panel" id="account-created">
 	<div class="inner-panel">
-		Account created successfully.
+		Account created successfully.<br><br>
+		<a class="internal" href="#!mylog/home">Go to your MobiLog</a>
 	</div>
 </div>
 
@@ -65,3 +65,57 @@
 	</div>
 </div>
 
+<div class="panel" id="user-topbar">
+	<div class="inner-panel">
+		<div class="user-topbar-username"></div>
+		<div class="user-topbar-links">
+			<a class="user-topbar" href="#!mylog/home">
+				Home
+			</a>
+			<a class="user-topbar" href="#!mylog/privatelog">
+				Private Log
+			</a>
+			<a class="user-topbar" href="#!mylog/citizenprofiles">
+				Citizen Profiles
+			</a>
+			<a class="user-topbar" href="#!mylog/accountmanager">
+				Account Manager
+			</a>
+		</div>
+	</div>
+</div>
+
+<div class="panel" id="user-pages">
+	<div class="inner-panel">
+		<div class="create-page">
+			<span style="font-size: 36; position: relative; left: 10px">+</span> <span style="position: absolute; left: 50px; top: 24px;">Create new page</span>
+		</div>
+	</div>
+</div>
+
+<div class="panel" id="user-notifications">
+	<div class="inner-panel">
+		<div class="notifications">
+			Notifications
+		</div>
+	</div>
+</div>
+
+<div class="panel" id="private-log-entry-list">
+	<div class="inner-panel" style="overflow-y: scroll">
+		<div class="entry-selector">Create Entry</div>
+	</div>
+</div>
+
+<form class="create-entry-form" method="POST">
+	<textarea name="content"></textarea>
+	<input type="submit"/>
+</form>	
+
+<div class="panel" id="private-log-entry-viewer">
+	<div class="inner-panel">
+		<div class="content">
+			Content
+		</div>
+	</div>
+</div>

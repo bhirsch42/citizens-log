@@ -97,11 +97,9 @@ class GetUserHandler(Handler):
 			user = Database.get_user(username)
 		if not user:
 			return
-		entries = []
-		for entry in user.entries:
-			entries.append({"title": entry.title, "content": entry.content})
-		obj = json.dumps({"username":user.username, "entries":entries, "pageName":user.page_name})
-		self.response.write(str(obj))
+		# TODO
+		obj = json.dumps({"username":user.username})
+		self.response.out.write(str(obj))
 
 class GetAllUsersHandler(Handler):
 	def get(self):
@@ -140,12 +138,47 @@ class LoginHandler(Handler):
 		else:
 			self.response.out.write("Failure")
 
+class RegisterHandler(Handler):
+	def get(self):
+		pass
+	def post(self):
+		username_is_taken = False
+		passwords_dont_match = False
+		username_is_invalid = False
+
+		username = self.request.get('username')
+		password = self.request.get('password')
+		password_repeat = self.request.get('password-repeat')
+		email = self.request.get('email')
+
+		username_is_taken = username in Database.get_all_users()
+		passwords_dont_match = password != password_repeat
+		username_is_invalid = re.match("^[a-zA-Z0-9_-]{3,20}$", username) is None
+		if username_is_taken or passwords_dont_match or username_is_invalid:
+			s = "Failure"
+			if username_is_taken:
+				s += " username_is_taken"
+			if passwords_dont_match:
+				s += " passwords_dont_match"
+			if username_is_invalid:
+				s += ' username_is_invalid'
+			self.response.out.write(s)
+		else:
+			Database.add_user(username, password, email)
+			self.login(Database.get_user(username))
+			self.response.out.write("Success")
+
+class ValidateCookieHandler(Handler):
+	def get(self):
+		self.response.out.write(self.read_secure_cookie('user_id'))
 
 app = webapp2.WSGIApplication([
 	('/', MainHandler),
 	('/control/getuser', GetUserHandler),
 	('/control/getallusers', GetAllUsersHandler),
 	('/control/login', LoginHandler),
-	('/static/panelsHTML', PanelsHTMLHandler)
+	('/control/register', RegisterHandler),
+	('/static/panelsHTML', PanelsHTMLHandler),
+	('/control/validatecooke', ValidateCookieHandler)
 	# ('/entryeditor', EntryEditorHandler)
 ], debug=True)

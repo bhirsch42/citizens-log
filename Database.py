@@ -9,19 +9,15 @@ import datetime
 
 users_key = "users"
 
-
-class MyUser(ndb.Model):
-	username = ndb.StringProperty(required=True)
-	password_hash = ndb.StringProperty(required=True)
-	email = ndb.StringProperty(required=False)
-	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
-	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
-	pages = ndb.StructuredProperty(Page, repeated=True)
-	pages_of_interest = ndb.StructuredProperty(PageOfInterest, repeated=True)
-
 class PageOfInterest(ndb.Model):
 	username = ndb.StringProperty(required=True)
 	pagename = ndb.StringProperty(required=True)
+
+class Entry(ndb.Model):
+	title = ndb.StringProperty(required=True)
+	content = ndb.TextProperty(required=True)
+	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
+	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=False)
 
 class Page(ndb.Model):
 	name = ndb.StringProperty(required=True)
@@ -30,12 +26,16 @@ class Page(ndb.Model):
 	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
 	poi_num = ndb.IntegerProperty(required=True)
 
-
-class Entry(ndb.Model):
-	title = ndb.StringProperty(required=True)
-	content = ndb.TextProperty(required=True)
+class MyUser(ndb.Model):
+	username = ndb.StringProperty(required=True)
+	password_hash = ndb.StringProperty(required=True)
+	email = ndb.StringProperty(required=False)
 	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
 	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
+	pages = ndb.KeyProperty(repeated=True)
+	pages_of_interest = ndb.StructuredProperty(PageOfInterest, repeated=True)
+
+
 
 def make_salt(length = 5):
 	return ''.join(random.choice(letters) for x in xrange(length))
@@ -54,7 +54,7 @@ def valid_password(username, password):
 	salt = h.split(',')[0]
 	return h == make_password_hash(username, password, salt)
 
-def add_user(page_name, username, password, email):
+def add_user(username, password, email):
 	# check if user exists
 	if (username in get_all_users()):
 		return false
@@ -62,7 +62,7 @@ def add_user(page_name, username, password, email):
 	password_hash = make_password_hash(username, password)
 
 	# add user to datastore
-	my_user = MyUser(page_name=page_name, username=username, password_hash=password_hash, email=email, entries=[])
+	my_user = MyUser(username=username, password_hash=password_hash, email=email, datetime_created=datetime.datetime.now())
 	my_user.put()
 
 	# update memcache

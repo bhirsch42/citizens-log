@@ -31,6 +31,15 @@ div.screen {
 	background: url("../res/holo.png");
 }
 
+div.bg-title {
+	position: absolute;
+	top: 40%;
+	width: 100%;
+	text-align: center;
+	font-size: 36px;
+	opacity: .2;
+}
+
 div.myscroll {
 	position: absolute;
 	left: 0;
