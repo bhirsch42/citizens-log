@@ -72,15 +72,9 @@ div.entry-selector {
 	/*border-radius: 5px;*/
 }
 
-
-
-
-
-
-
-
-
-
+.inner-panel#private-log-entry-viewer {
+	overflow: scroll;
+}
 
 
 

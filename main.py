@@ -125,6 +125,10 @@ class PanelsHTMLHandler(Handler):
 	def get(self):
 		self.render('panels.html')
 
+class TinyFormHTMLHandler(Handler):
+	def get(self):
+		self.render('tinyform.html')
+
 class LoginHandler(Handler):
 	def get(self):
 		pass
@@ -168,6 +172,28 @@ class RegisterHandler(Handler):
 			self.login(Database.get_user(username))
 			self.response.out.write("Success")
 
+class SubmitPrivateEntryHandler(Handler):
+	def get(self):
+		pass
+	def post(self):
+		content = self.request.get('content')
+		logging.info(content)
+		if not self.read_secure_cookie('user_id'):
+			self.redirect('#!login')
+		Database.add_private_entry(self.get_user(), content)
+
+class GetPrivateEntriesHandler(Handler):
+	def get(self):
+		if not self.read_secure_cookie('user_id'):
+			self.redirect('#!login')
+		titles = []
+		contents = []
+		for entry in self.get_user().private_log.entries:
+			titles.append(entry.title)
+			contents.append(entry.content)
+		obj = json.dumps({"titles":titles, "contents":contents})
+		self.response.out.write(obj)
+
 class ValidateCookieHandler(Handler):
 	def get(self):
 		self.response.out.write(self.read_secure_cookie('user_id'))
@@ -179,6 +205,9 @@ app = webapp2.WSGIApplication([
 	('/control/login', LoginHandler),
 	('/control/register', RegisterHandler),
 	('/static/panelsHTML', PanelsHTMLHandler),
+	('/static/tinyFormHTML', TinyFormHTMLHandler),
+	('/control/submitprivateentry', SubmitPrivateEntryHandler),
+	('/control/getprivatelogs', GetPrivateEntriesHandler),
 	('/control/validatecooke', ValidateCookieHandler)
 	# ('/entryeditor', EntryEditorHandler)
 ], debug=True)

@@ -1,5 +1,11 @@
 window.onload = function() {
 
+userTopbarPanel = null
+userPagesPanel = null
+userNotificationsPanel = null
+privateLogEntryListPanel = null
+privateLogEntryViewerPanel = null
+
 function getUsernameFromCookie() {
 	var cookieValue = $.cookie("user_id");
 	if (!cookieValue) {
@@ -20,6 +26,20 @@ function getUser() {
 		async: false
 	}).responseText
 	var obj = JSON.parse(data)
+	return obj
+}
+
+function getPrivateLogs() {
+	var username = getUsernameFromCookie()
+	if (!username) {
+		return null
+	}
+	data = $.ajax({
+		type: "GET",
+		url: '/control/getprivatelogs',
+		async: false
+	}).responseText
+	var obj = JSON.parse(data);
 	return obj
 }
 
@@ -50,8 +70,6 @@ var panels = $.ajax({
 	url: '/static/panelsHTML',
 	async: false
 }).responseText;
-
-var entryCreationForm = $($($.parseHTML(panels)).filter('.create-entry-form')[0])
 
 // define Panel "object" creator
 function Panel(sel) {
@@ -85,7 +103,7 @@ function Panel(sel) {
 			top: function() {return "95px"},
 			left: function() {return "0px"},
 			width: function() {return "50%"},
-			height: function() {return $this.parent().height() - 95}
+			height: function() {return mobiScreen.height() - 95}
 		})
 		return $this
 	}
@@ -98,9 +116,9 @@ function Panel(sel) {
 			height: function() {return "20"},
 		}, {
 			top: function() {return "95px"},
-			left: function() {return $this.parent().width()/2 - 5},
-			width: function() {return $this.parent().width()/2 + 5},
-			height: function() {return $this.parent().height() - 95}
+			left: function() {return mobiScreen.width()/2 - 5},
+			width: function() {return mobiScreen.width()/2 + 5},
+			height: function() {return mobiScreen.height() - 95}
 		})
 		return $this
 	}
@@ -115,8 +133,47 @@ function Panel(sel) {
 			top: function() {return "95px"},
 			left: function() {return 0},
 			width: function() {return 150},
-			height: function() {return $this.parent().height() - 95}
+			height: function() {return mobiScreen.height() - 95}
 		})
+		$this.update = function() {
+			$this = $(this)
+			// retrieve the user's private logs
+			var privateLogs = getPrivateLogs()
+			// append the log titles to the list panel
+			var $innerpanel = $('div.inner-panel', privateLogEntryListPanel)
+			var $selectors = $('div.entry-selector', $innerpanel)
+			$selectors.each(function(index) {
+				if (index != 0) {
+					$selectors[index].remove()
+				}
+			})
+			for (var i = privateLogs.titles.length - 1; i >= 0; i--) {
+				$('div.inner-panel', privateLogEntryListPanel).append($('div.entry-selector#0', privateLogEntryListPanel).clone().attr('id', privateLogs.titles.length - i).html(privateLogs.titles[i]))
+			}
+			$('div.entry-selector', privateLogEntryListPanel).click(function() {
+				var index = privateLogs.contents.length - parseInt($(this).attr('id'))
+				if (index == privateLogs.contents.length || privateLogs.contents.length == 0) {
+					window.location.hash = '#!mylog/privatelog/createentry'
+				} else {
+					window.location.hash = '#!mylog/privatelog/' + index
+				}
+			})
+
+			$('div.entry-selector', privateLogEntryListPanel).hover(function() {
+				$this = $(this)
+				$this.animate({
+					'background-color': 'rgba(0, 231, 255, .5)',
+					'color': 'white'
+				}, hoverAnimationDuration)
+			}, function() {
+				$this = $(this)
+				$this.animate({
+					'background-color': 'rgba(0, 231, 255, 0)',
+					'color': 'rgba(0, 231, 255, 1)'
+				}, hoverAnimationDuration)
+			})
+			window.location.hash = '#!mylog/privatelog/' + (String)(privateLogs.titles.length - 1)
+		}
 		return $this
 	}
 	// private logs entry viewer
@@ -129,9 +186,29 @@ function Panel(sel) {
 		}, {
 			top: function() {return "95px"},
 			left: function() {return 145},
-			width: function() {return $this.parent().width() - 145},
-			height: function() {return $this.parent().height() - 95}
+			width: function() {return mobiScreen.width() - 145},
+			height: function() {return mobiScreen.height() - 95}
 		})
+		$this.setContent = function(c) {
+			$this = (this)
+			$this.animate({
+				'opacity': 0
+			}, entryAnimationDuration, function() {
+				$this = $(this)
+				if ($('textarea', $this).length > 0) {
+					tinymce.EditorManager.execCommand('mceRemoveEditor', false, 'content');
+				}
+
+				$('div.inner-panel', $this).html(c)
+				
+				if ($('textarea', $this).length > 0) {
+					tinymce.EditorManager.execCommand('mceAddEditor', false, 'content');
+				}
+				$this.animate({
+					'opacity': 1
+				})
+			})
+		}
 		return $this
 	}
 
@@ -181,6 +258,7 @@ function makePanel(html, closedcss, opencss) {
 				$this.animate({
 					'height': o.height()
 				}, entryAnimationDuration, function() {
+					// $this.snapOpen()
 				})
 			});	
 		})
@@ -200,7 +278,7 @@ function makePanel(html, closedcss, opencss) {
 				"top": c.top(),
 				"left": c.left(),
 			}, entryAnimationDuration, function() {
-
+				// $this.snapClose()
 			})
 		});
 	}
@@ -358,18 +436,11 @@ function setTitle(s) {
 		}, titleAnimationDuration)
 	})
 }
-
-
 // Update on hashchange
 $(window).on('hashchange',function(){ 
 	hashChanged()
 });
-
-userTopbarPanel = null
-userPagesPanel = null
-userNotificationsPanel = null
-privateLogEntryListPanel = null
-privateLogEntryViewerPanel = null
+var oldHash = ''
 function hashChanged() {
 	hash = window.location.hash
 	hash = hash.split("!")[1]
@@ -377,6 +448,7 @@ function hashChanged() {
 		return
 	}
 	hashlist = hash.split('/')
+	oldhashlist = oldHash.split('/')
 	if (/^login$/.test(hashlist[0])) {
 		closeAllPanels()
 		loginPanel.open()
@@ -415,10 +487,13 @@ function hashChanged() {
 		}
 		if (hashlist.length < 2) {
 			window.location.hash="#!mylog/home"
+			return
 		}
 		userTopbarPanel.open()
 		if (hashlist[1] == 'home') {
-			closeAllPanelsExcept([userTopbarPanel])
+			if (oldhashlist.length < 2 || oldhashlist[1] != hashlist[1]) {
+				closeAllPanelsExcept([userTopbarPanel])
+			}
 			if (!userPagesPanel) {
 				userPagesPanel = Panel('user-pages')
 				mobiScreen.append(userPagesPanel)
@@ -432,21 +507,37 @@ function hashChanged() {
 		}
 		if (hashlist[1] == 'privatelog') {
 			if (hashlist.length < 3) {
-				window.location.hash="#!mylog/privatelog/createentry"
+				window.location.hash="#!mylog/privatelog/" + (String)(getPrivateLogs().titles.length - 1)
+				return
 			}
-			closeAllPanelsExcept([userTopbarPanel])
 			if (!privateLogEntryListPanel) {
 				privateLogEntryListPanel = Panel('private-log-entry-list')
 				mobiScreen.append(privateLogEntryListPanel)
+				privateLogEntryListPanel.update()
 			}
 			if (!privateLogEntryViewerPanel) {
 				privateLogEntryViewerPanel = Panel('private-log-entry-viewer')
 				mobiScreen.append(privateLogEntryViewerPanel)
 			}
-			privateLogEntryListPanel.open()
-			privateLogEntryViewerPanel.open()
+			if (!privateLogEntryListPanel.isOpen()) {
+				closeAllPanelsExcept([userTopbarPanel])
+				privateLogEntryViewerPanel.open()
+				privateLogEntryListPanel.open()
+			}
 			if (hashlist[2] == 'createentry') {
-				privateLogEntryViewerPanel.html(entryCreationForm) // IN PROGRESS.  NEED TO PUT CONTENT IN INNER PANEL
+				$form = $("<form><textarea name=\"content\" id=\"content\"></textarea><input type=\"submit\"></input></form>")
+				privateLogEntryViewerPanel.setContent($form)
+				addEntryCreationBehaviorTo($form, '/control/submitprivateentry')
+			} else {
+				var updateContent = true
+				var index = parseInt(hashlist[2])
+				if (oldhashlist.length >= 3) {
+					var oldIndex = parseInt(oldhashlist[2])
+					updateContent = index != oldIndex
+				}
+				if (updateContent) {
+					privateLogEntryViewerPanel.setContent(getPrivateLogs().contents[index])
+				}
 			}
 		}
 		if (hashlist[1] == 'citizenprofiles') {
@@ -456,6 +547,31 @@ function hashChanged() {
 			closeAllPanelsExcept([userTopbarPanel])
 		}
 	}
+	oldHash = hash
+}
+
+function addEntryCreationBehaviorTo($form, postURL) {
+	$entryCreationForm = $form
+	$entryCreationForm.submit(function(e) {
+		var $form = $(this)
+		var data = tinyMCE.activeEditor.getContent();
+		e.preventDefault()
+		request = $.ajax({
+			type: "POST",
+			url: postURL,
+			data: {'content':data},
+			async: false
+		})
+		request.done(function (response, textStatus, jqXHR){
+			privateLogEntryListPanel.update()
+		});
+		request.fail(function (jqXHR, textStatus, errorThrown){
+
+		});
+		request.always(function () {
+
+		});
+	})
 }
 
 // on window resize
@@ -469,6 +585,15 @@ $(window).resize(function() {
 	openPanels = ps;
 })
 
+function initTinyMCE() {
+	tinymce.init({
+		// mode:'textareas',
+		skin: 'logentry',
+		content_css: '../stylesheets/style.css',
+		plugins: "image, media, hr"
+	});
+}
+
 // on load
 $(function() {
 	// append default panels
@@ -477,6 +602,7 @@ $(function() {
 	mobiScreen.append(registerPanel)
 	mobiScreen.append(accountCreatedPanel)
 	hashChanged()
+	initTinyMCE()
 })
 
 }

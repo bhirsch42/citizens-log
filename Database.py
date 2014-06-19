@@ -23,16 +23,17 @@ class Page(ndb.Model):
 	name = ndb.StringProperty(required=True)
 	entries = ndb.StructuredProperty(Entry, repeated=True)
 	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
-	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
-	poi_num = ndb.IntegerProperty(required=True)
+	datetime_modified = ndb.DateTimeProperty(auto_now_add=True)
+	poi_num = ndb.IntegerProperty()
 
 class MyUser(ndb.Model):
 	username = ndb.StringProperty(required=True)
 	password_hash = ndb.StringProperty(required=True)
 	email = ndb.StringProperty(required=False)
 	datetime_created = ndb.DateTimeProperty(required=True, auto_now_add=False)
-	datetime_modified = ndb.DateTimeProperty(required=True, auto_now_add=True)
+	datetime_modified = ndb.DateTimeProperty(auto_now_add=True)
 	pages = ndb.KeyProperty(repeated=True)
+	private_log = ndb.StructuredProperty(Page, required=True)
 	pages_of_interest = ndb.StructuredProperty(PageOfInterest, repeated=True)
 
 
@@ -61,8 +62,11 @@ def add_user(username, password, email):
 
 	password_hash = make_password_hash(username, password)
 
+	now = datetime.datetime.now()
+	private_log = Page(name="Private Log", datetime_created=now)
+
 	# add user to datastore
-	my_user = MyUser(username=username, password_hash=password_hash, email=email, datetime_created=datetime.datetime.now())
+	my_user = MyUser(username=username, password_hash=password_hash, email=email, datetime_created=now, private_log=private_log)
 	my_user.put()
 
 	# update memcache
@@ -72,22 +76,23 @@ def add_user(username, password, email):
 
 	return True
 
-def add_entry(user, content):
+def add_private_entry(user, content):
+	now = datetime.datetime.now()
 	title = time.strftime("%m/%d/%y %H:%M", time.localtime())
-	entry = Entry(title = title, content = content)
-	if not user.entries:
-		user.entries = [entry]
+	entry = Entry(title = title, content = content, datetime_created = now, datetime_modified = now)
+	if not user.private_log.entries:
+		user.private_log.entries = [entry]
 	else:
-		user.entries.append(entry)
+		user.private_log.entries.append(entry)
 	user.put()
-	update_user_memcache()
+	update_user_memcache(user=user)
 
 def replace_entry_content(user, markdown, entry_index):
 	if (len(user.entries) <= entry_index):
 		return
 	user.entries[entry_index].content = markdown
 	user.put()
-	update_user_memcache()
+	update_user_memcache(user=user)
 
 def get_all_users(update=False):
 	my_users = memcache.get(users_key)
@@ -100,7 +105,13 @@ def get_all_users(update=False):
 	return my_users
 
 
-def update_user_memcache():
+def update_user_memcache(user = None):
+	if user:
+		user_dict = memcache.get(users_key)
+		add_user_to_dict(user, user_dict)
+		memcache.set(users_key, user_dict)
+		return
+
 	registered_users = ndb.gql("SELECT * FROM MyUser")
 	my_user_dict = {}
 	for registered_user in registered_users:
